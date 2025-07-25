@@ -25,14 +25,14 @@ function AdminDashboard() {
 	}
 
 	return (
-		<div className='flex h-screen bg-muted'>
+		<div className='flex min-h-screen bg-muted flex-col md:flex-row'>
 			<Sidebar
 				active={activePage}
 				onNavigate={setActivePage}
 				onLogout={handleLogout}
 			/>
-			<div className='flex-1 p-4 sm:p-6 overflow-y-auto'>
-				<div className='w-full h-full'>
+			<div className='flex-1 p-4 sm:p-6 overflow-y-auto w-full'>
+				<div className='w-full h-full max-w-7xl mx-auto'>
 					{activePage === 'users' && <UsersList />}
 					{activePage === 'createUser' && <CreateUser />}
 					{activePage === 'sellers' && <SellersList />}

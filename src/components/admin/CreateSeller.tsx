@@ -97,9 +97,11 @@ export default function CreateSeller() {
 	}
 
 	return (
-		<div className=' flex items-center justify-center bg-muted p-4 sm:p-6'>
-			<div className='w-full max-w-md space-y-4'>
-				<h1 className='text-xl font-bold text-forest'>Sotuvchi qo`shish</h1>
+		<div className='min-h-screen flex items-center justify-center bg-muted p-4 sm:p-6'>
+			<div className='w-full max-w-md space-y-4 sm:max-w-lg'>
+				<h1 className='text-lg sm:text-xl font-bold text-forest'>
+					Sotuvchi qo`shish
+				</h1>
 				<form onSubmit={handleSubmit} className='space-y-4'>
 					<div>
 						<label className='text-sm font-medium text-forest'>
@@ -109,9 +111,12 @@ export default function CreateSeller() {
 							placeholder='Ism Familiya'
 							value={fullName}
 							onChange={e => setFullName(e.target.value)}
+							className='text-sm'
 						/>
 						{errors.fullName && (
-							<p className='text-red-500 text-sm'>{errors.fullName}</p>
+							<p className='text-red-500 text-xs sm:text-sm'>
+								{errors.fullName}
+							</p>
 						)}
 					</div>
 					<div>
@@ -120,9 +125,10 @@ export default function CreateSeller() {
 							placeholder='Email'
 							value={email}
 							onChange={e => setEmail(e.target.value)}
+							className='text-sm'
 						/>
 						{errors.email && (
-							<p className='text-red-500 text-sm'>{errors.email}</p>
+							<p className='text-red-500 text-xs sm:text-sm'>{errors.email}</p>
 						)}
 					</div>
 					<div>
@@ -131,9 +137,10 @@ export default function CreateSeller() {
 							placeholder='Telefon (+998...)'
 							value={phone}
 							onChange={e => setPhone(e.target.value)}
+							className='text-sm'
 						/>
 						{errors.phone && (
-							<p className='text-red-500 text-sm'>{errors.phone}</p>
+							<p className='text-red-500 text-xs sm:text-sm'>{errors.phone}</p>
 						)}
 					</div>
 					<div className='relative'>
@@ -143,20 +150,23 @@ export default function CreateSeller() {
 							placeholder='Parol'
 							value={password}
 							onChange={e => setPassword(e.target.value)}
+							className='text-sm'
 						/>
 						<button
 							type='button'
 							onClick={() => setShowPassword(prev => !prev)}
-							className='absolute right-2 top-11 -translate-y-1/2'
+							className='absolute right-2 top-10 sm:top-11 -translate-y-1/2'
 						>
 							{showPassword ? (
-								<EyeOffIcon className='w-5 h-5 text-forest' />
+								<EyeOffIcon className='w-4 sm:w-5 h-4 sm:h-5 text-forest' />
 							) : (
-								<EyeIcon className='w-5 h-5 text-forest' />
+								<EyeIcon className='w-4 sm:w-5 h-4 sm:h-5 text-forest' />
 							)}
 						</button>
 						{errors.password && (
-							<p className='text-red-500 text-sm'>{errors.password}</p>
+							<p className='text-red-500 text-xs sm:text-sm'>
+								{errors.password}
+							</p>
 						)}
 					</div>
 					<div>
@@ -167,9 +177,12 @@ export default function CreateSeller() {
 							placeholder='Masalan: Nihol planting'
 							value={businessName}
 							onChange={e => setBusinessName(e.target.value)}
+							className='text-sm'
 						/>
 						{errors.businessName && (
-							<p className='text-red-500 text-sm'>{errors.businessName}</p>
+							<p className='text-red-500 text-xs sm:text-sm'>
+								{errors.businessName}
+							</p>
 						)}
 					</div>
 					<div>
@@ -178,15 +191,18 @@ export default function CreateSeller() {
 							placeholder='Manzil'
 							value={address}
 							onChange={e => setAddress(e.target.value)}
+							className='text-sm'
 						/>
 						{errors.address && (
-							<p className='text-red-500 text-sm'>{errors.address}</p>
+							<p className='text-red-500 text-xs sm:text-sm'>
+								{errors.address}
+							</p>
 						)}
 					</div>
 					<div>
 						<label className='text-sm font-medium text-forest'>Tajriba</label>
 						<Select value={experience} onValueChange={setExperience}>
-							<SelectTrigger className='border-forest/20'>
+							<SelectTrigger className='border-forest/20 text-sm'>
 								<SelectValue placeholder='Tajriba tanlang' />
 							</SelectTrigger>
 							<SelectContent>
@@ -198,12 +214,14 @@ export default function CreateSeller() {
 							</SelectContent>
 						</Select>
 						{errors.experience && (
-							<p className='text-red-500 text-sm'>{errors.experience}</p>
+							<p className='text-red-500 text-xs sm:text-sm'>
+								{errors.experience}
+							</p>
 						)}
 					</div>
 					<Button
 						type='submit'
-						className='w-full bg-gradient-to-r from-forest to-moss text-white'
+						className='w-full bg-gradient-to-r from-forest to-moss text-white text-sm sm:text-base'
 						disabled={loading}
 					>
 						{loading ? 'Yuborilmoqda...' : 'Qo`shish'}

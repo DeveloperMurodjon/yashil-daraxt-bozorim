@@ -20,5 +20,8 @@ export interface UserT {
 	role: string
 }
 
+// auth tabs types
+export type AuthTabT = 'login' | 'register'
+
 // admin Tabs types
 export type AdminTabT = 'users' | 'sellers' | 'createUser' | 'createSeller'
