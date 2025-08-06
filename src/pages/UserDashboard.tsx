@@ -1,21 +1,21 @@
-import React, { useEffect, useState } from 'react'
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
+import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
-import { ArrowLeft } from 'lucide-react'
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
-import DashboardTab from '@/components/sellerDashboard/DashboardTab'
-import ProductsTab from '@/components/sellerDashboard/ProductsTab'
-import OrdersTab from '@/components/sellerDashboard/OrdersTab'
-import ProfileTab from '@/components/sellerDashboard/ProfileTab'
+import { ArrowLeft } from 'lucide-react'
+import BrowseTab from '@/components/userDashboard/BrowseTab'
+import OrdersTab from '@/components/userDashboard/OrdersTab'
+import FavoritesTab from '@/components/userDashboard/FavoritesTab'
+import ProfileTab from '@/components/userDashboard/ProfileTab'
 import { UserProfile } from '@/types/types'
 
-const SellerDashboard = () => {
+const UserDashboard = () => {
 	const [searchParams, setSearchParams] = useSearchParams()
-	const initialTab = searchParams.get('tab') || 'dashboard'
+	const initialTab = searchParams.get('tab') || 'browse'
 	const [activeTab, setActiveTab] = useState(initialTab)
 	const [user, setUser] = useState<UserProfile>({
 		id: localStorage.getItem('userId') || '',
-		fullName: localStorage.getItem('name') || '',
+		fullName: localStorage.getItem('fullname') || '',
 		email: localStorage.getItem('email') || '',
 		phone: '',
 		role:
@@ -45,6 +45,14 @@ const SellerDashboard = () => {
 		fetchProfile()
 	}, [navigate])
 
+	useEffect(() => {
+		setSearchParams({ tab: activeTab })
+	}, [activeTab, setSearchParams])
+
+	const handleTab = (tab: string) => {
+		setActiveTab(tab)
+	}
+
 	const handleLogout = () => {
 		localStorage.clear()
 		navigate('/auth')
@@ -52,7 +60,6 @@ const SellerDashboard = () => {
 
 	return (
 		<div className='min-h-screen bg-gradient-to-br from-sage via-accent to-background'>
-			{/* Header */}
 			<div className='bg-card/90 backdrop-blur-sm border-b shadow-card'>
 				<div className='container mx-auto px-4 py-4'>
 					<div className='flex items-center justify-between'>
@@ -65,13 +72,11 @@ const SellerDashboard = () => {
 								Asosiy sahifa
 							</Link>
 							<div className='h-6 w-px bg-border'></div>
-							<h1 className='text-2xl font-bold text-forest'>
-								Sotuvchi Paneli
-							</h1>
+							<h1 className='text-2xl font-bold text-forest'>Xaridor Paneli</h1>
 						</div>
 						<div className='flex items-center space-x-4'>
 							<span className='text-muted-foreground'>
-								Salom {user.fullName}
+								Salom, {user.fullName || 'Foydalanuvchi'}
 							</span>
 							<Button variant='outline' size='sm' onClick={handleLogout}>
 								Chiqish
@@ -82,29 +87,29 @@ const SellerDashboard = () => {
 			</div>
 
 			<div className='container mx-auto px-4 py-6'>
-				<Tabs
-					value={activeTab}
-					onValueChange={setActiveTab}
-					className='space-y-6'
-				>
+				<Tabs value={activeTab} onValueChange={handleTab} className='space-y-6'>
 					<TabsList className='grid w-full grid-cols-4'>
-						<TabsTrigger value='dashboard'>Bosh sahifa</TabsTrigger>
-						<TabsTrigger value='products'>Mahsulotlar</TabsTrigger>
-						<TabsTrigger value='orders'>Buyurtmalar</TabsTrigger>
+						<TabsTrigger value='browse'>Ko'chatlar</TabsTrigger>
+						<TabsTrigger value='orders'>Buyurtmalarim</TabsTrigger>
+						<TabsTrigger value='favorites'>Sevimlilar</TabsTrigger>
 						<TabsTrigger value='profile'>Profil</TabsTrigger>
 					</TabsList>
 
-					<TabsContent value='dashboard'>
-						<DashboardTab />
-					</TabsContent>
-					<TabsContent value='products'>
-						<ProductsTab />
+					<TabsContent value='browse'>
+						<BrowseTab user={user} setUser={setUser} />
 					</TabsContent>
 					<TabsContent value='orders'>
-						<OrdersTab />
+						<OrdersTab user={user} setUser={setUser} />
+					</TabsContent>
+					<TabsContent value='favorites'>
+						<FavoritesTab user={user} setUser={setUser} />
 					</TabsContent>
 					<TabsContent value='profile'>
-						<ProfileTab user={user} setUser={setUser} />
+						<ProfileTab
+							user={user}
+							setUser={setUser}
+							handleLogout={handleLogout}
+						/>
 					</TabsContent>
 				</Tabs>
 			</div>
@@ -112,4 +117,4 @@ const SellerDashboard = () => {
 	)
 }
 
-export default SellerDashboard
+export default UserDashboard

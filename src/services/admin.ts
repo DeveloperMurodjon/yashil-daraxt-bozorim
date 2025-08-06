@@ -22,7 +22,7 @@ export const createUser = async (data: {
 	phone: string
 	password: string
 }) => {
-	await api.post('http://34.229.90.146:3000/admin/create-user', data, {
+	await api.post('/admin/create-user', data, {
 		headers: { Authorization: `Bearer ${token}` },
 	})
 }
@@ -36,19 +36,19 @@ export const createSeller = async (data: {
 	experience: string
 	address: string
 }) => {
-	await api.post('http://34.229.90.146:3000/admin/create-saller', data, {
+	await api.post('/admin/create-saller', data, {
 		headers: { Authorization: `Bearer ${token}` },
 	})
 }
 
 export const deleteUser = async (id: number) => {
-	await api.delete(`http://34.229.90.146:3000/admin/delete-user/${id}`, {
+	await api.delete(`/admin/delete-user/${id}`, {
 		headers: { Authorization: `Bearer ${token}` },
 	})
 }
 
 export const deleteSeller = async (id: number) => {
-	await api.delete(`http://34.229.90.146:3000/admin/delete-saller/${id}`, {
+	await api.delete(`/admin/delete-saller/${id}`, {
 		headers: { Authorization: `Bearer ${token}` },
 	})
 }

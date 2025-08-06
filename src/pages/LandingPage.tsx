@@ -21,11 +21,28 @@ import {
 	Clock,
 	Heart,
 } from 'lucide-react'
-import { Link } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
 
 const LandingPage = () => {
+	const navigate = useNavigate()
+	const role = localStorage.getItem('role')
+	const isAuthenticated = !!localStorage.getItem('access_token')
+	const handleViewTreesClick = () => {
+		if (!isAuthenticated) {
+			navigate('/auth')
+		} else if (role === 'user') {
+			navigate('/user-dashboard')
+		} else if (role === 'seller') {
+			navigate('/seller-dashboard')
+		}
+	}
+
+	const handleBecomeSellerClick = () => {
+		navigate('/auth', { state: { defaultRole: 'seller' } })
+	}
+
 	const features = [
 		{
 			icon: Users,
@@ -127,7 +144,7 @@ const LandingPage = () => {
 
 						<h1 className='text-4xl md:text-6xl lg:text-7xl font-bold text-foreground leading-tight'>
 							Daraxt Ko'chatlari
-							<span className='block text-forest bg-gradient-to-r from-forest to-moss bg-clip-text '>
+							<span className='block text-forest bg-gradient-to-r from-forest to-moss bg-clip-text'>
 								Bozori
 							</span>
 						</h1>
@@ -138,24 +155,24 @@ const LandingPage = () => {
 						</p>
 
 						<div className='flex flex-col sm:flex-row gap-4 justify-center max-w-md mx-auto'>
-							<Link to='/buyer-dashboard' className='flex-1'>
-								<Button
-									size='lg'
-									className='w-full bg-gradient-to-r from-forest to-moss hover:from-primary-hover hover:to-forest shadow-nature transition-all duration-300 transform hover:scale-105'
-								>
-									Ko'chatlar Ko'rish
-									<ArrowRight className='ml-2 h-5 w-5' />
-								</Button>
-							</Link>
-							<Link to='/auth' className='flex-1'>
-								<Button
-									size='lg'
-									variant='outline'
-									className='w-full border-forest/20 text-forest hover:bg-forest hover:text-primary-foreground'
-								>
-									Sotuvchi Bo'lish
-								</Button>
-							</Link>
+							<Button
+								size='lg'
+								onClick={handleViewTreesClick}
+								className='w-full bg-gradient-to-r from-forest to-moss hover:from-primary-hover hover:to-forest shadow-nature transition-all duration-300 transform hover:scale-105'
+							>
+								{role === 'seller'
+									? "Ko'chatlarni Sotish"
+									: "Ko'chatlarni Ko'rish"}
+								<ArrowRight className='ml-2 h-5 w-5' />
+							</Button>
+							<Button
+								size='lg'
+								variant='outline'
+								onClick={handleBecomeSellerClick}
+								className='w-full border-forest/20 text-forest hover:bg-forest hover:text-primary-foreground'
+							>
+								Sotuvchi Bo'lish
+							</Button>
 						</div>
 
 						{/* Stats */}
@@ -294,25 +311,24 @@ const LandingPage = () => {
 						sotuvchi sifatida ro'yxatdan o'ting.
 					</p>
 					<div className='flex flex-col sm:flex-row gap-4 justify-center max-w-md mx-auto'>
-						<Link to='/auth' className='flex-1'>
-							<Button
-								size='lg'
-								variant='secondary'
-								className='w-full bg-primary-foreground text-forest hover:bg-primary-foreground/90'
-							>
-								Hozir Ro'yxatdan O'tish
-								<ArrowRight className='ml-2 h-5 w-5' />
-							</Button>
-						</Link>
-						<Link to='/buyer-dashboard' className='flex-1'>
-							<Button
-								size='lg'
-								variant='outline'
-								className='w-full border-primary-foreground text-primary-foreground hover:bg-primary-foreground hover:text-forest'
-							>
-								Ko'chatlarni Ko'rish
-							</Button>
-						</Link>
+						<Button
+							size='lg'
+							onClick={handleViewTreesClick}
+							className='w-full bg-primary-foreground text-forest hover:bg-primary-foreground/90'
+						>
+							{role === 'seller'
+								? "Ko'chatlarni Sotish"
+								: "Ko'chatlarni Ko'rish"}
+							<ArrowRight className='ml-2 h-5 w-5' />
+						</Button>
+						<Button
+							size='lg'
+							variant='outline'
+							onClick={handleBecomeSellerClick}
+							className='w-full border-primary-foreground text-primary-foreground hover:bg-primary-foreground text-forest'
+						>
+							Sotuvchi Bo'lish
+						</Button>
 					</div>
 				</div>
 			</section>

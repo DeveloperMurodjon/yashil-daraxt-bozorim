@@ -9,7 +9,6 @@ import {
 	CreateSeller,
 } from '@/components/admin/index'
 import { CheckCircle } from 'lucide-react'
-import { Button } from '@/components/ui/button'
 import { toast } from 'react-toastify'
 
 function AdminDashboard() {

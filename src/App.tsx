@@ -6,11 +6,11 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import Index from './pages/Index'
 import Auth from './pages/Auth'
 import SellerDashboard from './pages/SellerDashboard'
-import BuyerDashboard from './pages/BuyerDashboard'
 import NotFound from './pages/NotFound'
 import Profile from './pages/Profile'
 import AdminLogin from './pages/AdminLogin'
 import AdminDashboard from './pages/AdminDashboard'
+import UserDashboard from './pages/UserDashboard'
 
 const queryClient = new QueryClient()
 
@@ -43,7 +43,7 @@ const App = () => (
 					<Route path='/' element={<Index />} />
 					<Route path='/auth' element={<Auth />} />
 					<Route path='/seller-dashboard' element={<SellerDashboard />} />
-					<Route path='/buyer-dashboard' element={<BuyerDashboard />} />
+					<Route path='/user-dashboard' element={<UserDashboard />} />
 					<Route path='/profile' element={<Profile />} />
 					<Route path='/admin' element={<AdminLogin />} />
 					<Route

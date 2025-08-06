@@ -22,7 +22,7 @@ interface RegisterPayload {
 	password: string
 	businessName?: string
 	experience?: string
-	address?: string
+	addres?: string
 }
 
 interface RegisterProps {
@@ -44,7 +44,7 @@ export default function Register({
 	const [showPassword, setShowPassword] = useState(false)
 	const [loading, setLoading] = useState(false)
 	const [businessName, setBusinessName] = useState('')
-	const [address, setAddress] = useState('')
+	const [addres, setAddress] = useState('')
 	const [experience, setExperience] = useState('')
 	const [errors, setErrors] = useState<ErrorState>({
 		fullName: '',
@@ -53,7 +53,21 @@ export default function Register({
 		password: '',
 		otp: '',
 	})
-
+	const viloyatlar = [
+		'Andijon',
+		'Buxoro',
+		'Farg`ona',
+		'Jizzax',
+		'Xorazm',
+		'Namangan',
+		'Navoiy',
+		'Qashqadaryo',
+		'Samarqand',
+		'Sirdaryo',
+		'Surxondaryo',
+		'Toshkent viloyati',
+		'Toshkent shahri',
+	]
 	const validate = (): boolean => {
 		const e: ErrorState = {
 			fullName: !fullName ? 'Ism Familiya kerak' : '',
@@ -91,7 +105,7 @@ export default function Register({
 			if (role === 'seller') {
 				payload.businessName = businessName
 				payload.experience = experience
-				payload.address = address
+				payload.addres = addres
 			}
 			await registerUser(payload, role)
 			toast.success('Ro`yxatdan o`tildi! Endi login qiling.', {
@@ -99,10 +113,9 @@ export default function Register({
 			})
 			setTab('login')
 		} catch (err) {
-			toast.error(
-				err.response?.data?.error?.message || 'Royxatdan o`tishda xatolik',
-				{ icon: <AlertCircle className='w-5 h-5 text-red-500' /> }
-			)
+			toast.error(err.message || 'Royxatdan o`tishda xatolik', {
+				icon: <AlertCircle className='w-5 h-5 text-red-500' />,
+			})
 		} finally {
 			setLoading(false)
 		}
@@ -178,11 +191,19 @@ export default function Register({
 					</div>
 					<div>
 						<label className='text-sm font-medium text-forest'>Manzil</label>
-						<Input
-							placeholder='Manzil'
-							value={address}
+						<select
+							id='profile-addres'
+							name='addres'
+							value={addres}
 							onChange={e => setAddress(e.target.value)}
-						/>
+							className='w-full p-2 border border-border rounded-md bg-background text-forest focus:outline-none focus:ring-2 focus:ring-forest/50'
+						>
+							{viloyatlar.map(viloyat => (
+								<option key={viloyat} value={viloyat}>
+									{viloyat}
+								</option>
+							))}
+						</select>
 					</div>
 					<div>
 						<label className='text-sm font-medium text-forest'>Tajriba</label>
@@ -191,7 +212,6 @@ export default function Register({
 							onChange={e => setExperience(e.target.value)}
 							className='w-full border rounded p-2 border-forest/20 bg-white'
 						>
-							<option value=''>Tajriba tanlang</option>
 							<option value='1'>1 yilgacha</option>
 							<option value='1-3'>1-3 yil</option>
 							<option value='3-5'>3-5 yil</option>

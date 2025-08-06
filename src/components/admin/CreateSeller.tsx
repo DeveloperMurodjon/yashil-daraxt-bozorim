@@ -28,7 +28,7 @@ export default function CreateSeller() {
 		email: '',
 		phone: '',
 		password: '',
-		address: '',
+		addres: '',
 		businessName: '',
 		experience: '',
 	})
@@ -55,7 +55,7 @@ export default function CreateSeller() {
 				  /[!@#$%^&*()_+=-]/.test(password)
 				? ''
 				: 'Parol kamida 8ta belgidan, katta va kichik harf, raqam va belgidan iborat bo`lishi lozim',
-			address: address ? '' : 'Manzil kerak',
+			addres: address ? '' : 'Manzil kerak',
 			businessName: businessName ? '' : 'Biznes nomi kerak',
 			experience: experience ? '' : 'Tajriba tanlash kerak',
 		}
@@ -193,10 +193,8 @@ export default function CreateSeller() {
 							onChange={e => setAddress(e.target.value)}
 							className='text-sm'
 						/>
-						{errors.address && (
-							<p className='text-red-500 text-xs sm:text-sm'>
-								{errors.address}
-							</p>
+						{errors.addres && (
+							<p className='text-red-500 text-xs sm:text-sm'>{errors.addres}</p>
 						)}
 					</div>
 					<div>
@@ -207,9 +205,9 @@ export default function CreateSeller() {
 							</SelectTrigger>
 							<SelectContent>
 								<SelectItem value='1'>1 yilgacha</SelectItem>
-								<SelectItem value='1-3'>1–3 yil</SelectItem>
-								<SelectItem value='3-5'>3–5 yil</SelectItem>
-								<SelectItem value='5-10'>5–10 yil</SelectItem>
+								<SelectItem value='1-3'>1-3 yil</SelectItem>
+								<SelectItem value='3-5'>3-5 yil</SelectItem>
+								<SelectItem value='5-10'>5-10 yil</SelectItem>
 								<SelectItem value='10+'>10+ yil</SelectItem>
 							</SelectContent>
 						</Select>

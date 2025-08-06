@@ -2,23 +2,63 @@ import { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
+import ProductIcon from '@/assets/product.svg'
+import DashboardIcon from '@/assets/dashboard.svg'
 import { Menu, X, Search, ShoppingCart, User, Heart, Leaf } from 'lucide-react'
+import { getUserOrders } from '@/services/productService'
 
 const Navbar = () => {
 	const [isMenuOpen, setIsMenuOpen] = useState(false)
 	const [isLoggedIn, setIsLoggedIn] = useState(false)
+	const [orderCount, setOrderCount] = useState(0)
+	const role = localStorage.getItem('role')
+	const navigate = useNavigate()
 
 	useEffect(() => {
 		const token = localStorage.getItem('access_token')
 		setIsLoggedIn(!!token)
-	}, [])
+
+		const fetchOrderCount = async () => {
+			if (token) {
+				try {
+					const orders = await getUserOrders()
+					setOrderCount(orders.length)
+				} catch (error) {
+					console.error('Buyurtmalar sonini yuklashda xatolik:', error)
+					setOrderCount(0)
+				}
+			} else {
+				setOrderCount(0)
+			}
+		}
+		fetchOrderCount()
+	}, [role, isLoggedIn])
+
+	const getDashboardLink = (tab: string) => {
+		if (!isLoggedIn) return '/auth'
+
+		if (role === 'user') {
+			const userTabs = {
+				browse: '/user-dashboard?tab=browse',
+				favorites: '/user-dashboard?tab=favorites',
+				orders: '/user-dashboard?tab=orders',
+			}
+			return userTabs[tab] || '/user-dashboard?tab=browse'
+		} else if (role === 'seller') {
+			const sellerTabs = {
+				dashboard: '/seller-dashboard?tab=dashboard',
+				products: '/seller-dashboard?tab=products',
+				orders: '/seller-dashboard?tab=orders',
+			}
+			return sellerTabs[tab] || '/seller-dashboard?tab=dashboard'
+		}
+		return '/auth'
+	}
 
 	const navigationItems = [
 		{ name: 'Bosh Sahifa', href: '/' },
 		{ name: 'Kategoriyalar', href: '/categories' },
-		{ name: 'Mashhur', href: '/popular' },
 		{ name: 'Yangi', href: '/new' },
-		{ name: "Bog'ga Oid", href: '/garden' },
 	]
 
 	return (
@@ -51,24 +91,52 @@ const Navbar = () => {
 
 					{/* Desktop Actions */}
 					<div className='hidden md:flex items-center space-x-4'>
-						<Button variant='ghost' size='icon' className='hover:bg-sage/50'>
-							<Search className='h-5 w-5' />
-						</Button>
-
-						<Button variant='ghost' size='icon' className='hover:bg-sage/50'>
-							<Heart className='h-5 w-5' />
-						</Button>
-
-						<Button
-							variant='ghost'
-							size='icon'
-							className='relative hover:bg-sage/50'
+						<Link
+							to={getDashboardLink(role === 'user' ? 'browse' : 'dashboard')}
 						>
-							<ShoppingCart className='h-5 w-5' />
-							<Badge className='absolute -top-2 -right-2 h-5 w-5 flex items-center justify-center text-xs bg-forest text-primary-foreground'>
-								3
-							</Badge>
-						</Button>
+							<Button variant='ghost' size='icon' className='hover:bg-sage/50'>
+								{role === 'seller' ? (
+									<img
+										src={DashboardIcon}
+										alt='Dashboard Icon'
+										className='h-5 w-5'
+									/>
+								) : (
+									<Search className='h-5 w-5' />
+								)}
+							</Button>
+						</Link>
+
+						<Link
+							to={getDashboardLink(role === 'user' ? 'favorites' : 'products')}
+						>
+							<Button variant='ghost' size='icon' className='hover:bg-sage/50'>
+								{role === 'seller' ? (
+									<img
+										src={ProductIcon}
+										alt='Product Icon'
+										className='h-5 w-5'
+									/>
+								) : (
+									<Heart className='h-5 w-5' />
+								)}
+							</Button>
+						</Link>
+
+						<Link to={getDashboardLink('orders')}>
+							<Button
+								variant='ghost'
+								size='icon'
+								className='relative hover:bg-sage/50'
+							>
+								<ShoppingCart className='h-5 w-5' />
+								{orderCount > 0 && (
+									<Badge className='absolute -top-2 -right-2 h-6 w-6 flex items-center justify-center text-xs bg-forest text-primary-foreground'>
+										{orderCount}
+									</Badge>
+								)}
+							</Button>
+						</Link>
 
 						{isLoggedIn ? (
 							<Link to='/profile'>
@@ -87,12 +155,16 @@ const Navbar = () => {
 
 					{/* Mobile Menu Button */}
 					<div className='md:hidden flex items-center space-x-2'>
-						<Button variant='ghost' size='icon' className='relative'>
-							<ShoppingCart className='h-5 w-5' />
-							<Badge className='absolute -top-2 -right-2 h-5 w-5 flex items-center justify-center text-xs bg-forest text-primary-foreground'>
-								3
-							</Badge>
-						</Button>
+						<Link to={getDashboardLink('orders')}>
+							<Button variant='ghost' size='icon' className='relative'>
+								<ShoppingCart className='h-5 w-5' />
+								{orderCount > 0 && (
+									<Badge className='absolute -top-2 -right-2 h-6 w-6 flex items-center justify-center text-xs bg-forest text-primary-foreground'>
+										{orderCount}
+									</Badge>
+								)}
+							</Button>
+						</Link>
 
 						<Button
 							variant='ghost'
@@ -110,7 +182,7 @@ const Navbar = () => {
 
 				{/* Mobile Menu */}
 				{isMenuOpen && (
-					<div className='md:hidden absolute top-16 left-0 right-0 bg-card/98 backdrop-blur-md border-b border-border shadow-lg'>
+					<div className='md:hidden absolute top-16 left-0 right-0 bg-card border-b border-border shadow-lg'>
 						<div className='px-4 py-6 space-y-4'>
 							{navigationItems.map(item => (
 								<Link
@@ -124,25 +196,55 @@ const Navbar = () => {
 							))}
 
 							<div className='pt-4 border-t border-border space-y-3'>
-								<Button variant='outline' className='w-full justify-start'>
-									<Search className='h-4 w-4 mr-2' />
-									Qidirish
-								</Button>
+								<Link
+									to={getDashboardLink(
+										role === 'user' ? 'browse' : 'dashboard'
+									)}
+									onClick={() => setIsMenuOpen(false)}
+								>
+									<Button variant='outline' className='w-full justify-start'>
+										{role === 'seller' ? (
+											<img
+												src={DashboardIcon}
+												alt='Dashboard Icon'
+												className='h-4 w-4 mr-2'
+											/>
+										) : (
+											<Search className='h-4 w-4 mr-2' />
+										)}
+										{role === 'seller' ? 'Dashboard' : 'Qidirish'}
+									</Button>
+								</Link>
 
-								<Button variant='outline' className='w-full justify-start'>
-									<Heart className='h-4 w-4 mr-2' />
-									Sevimlilar
-								</Button>
+								<Link
+									to={getDashboardLink(
+										role === 'user' ? 'favorites' : 'products'
+									)}
+									onClick={() => setIsMenuOpen(false)}
+								>
+									<Button variant='outline' className='w-full justify-start'>
+										{role === 'seller' ? (
+											<img
+												src={ProductIcon}
+												alt='Product Icon'
+												className='h-4 w-4 mr-2'
+											/>
+										) : (
+											<Heart className='h-4 w-4 mr-2' />
+										)}
+										{role === 'seller' ? 'Mahsulotlar' : 'Sevimlilar'}
+									</Button>
+								</Link>
 
 								{isLoggedIn ? (
-									<Link to='/profile'>
+									<Link to='/profile' onClick={() => setIsMenuOpen(false)}>
 										<Button variant='outline' className='w-full justify-start'>
 											<User className='h-4 w-4 mr-2' />
 											Profil
 										</Button>
 									</Link>
 								) : (
-									<Link to='/auth'>
+									<Link to='/auth' onClick={() => setIsMenuOpen(false)}>
 										<Button className='w-full bg-gradient-to-r from-forest to-moss'>
 											Kirish
 										</Button>

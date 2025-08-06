@@ -11,7 +11,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { toast } from 'react-toastify'
 import { getProfile, deleteUser } from '@/services/auth'
-import { RoleType } from '@/services/auth'
+import { RoleType } from '@/types/types'
 
 interface SellerInfo {
 	businessName: string
@@ -31,7 +31,7 @@ interface UserProfile {
 export default function Profile() {
 	const [user, setUser] = useState<UserProfile>({
 		id: localStorage.getItem('userId') || '',
-		fullName: localStorage.getItem('email') || '',
+		fullName: localStorage.getItem('fullname') || '',
 		email: localStorage.getItem('email') || '',
 		phone: '',
 		role: (localStorage.getItem('role') as RoleType | 'admin') || 'user',
@@ -65,6 +65,7 @@ export default function Profile() {
 					return
 				}
 				const profile = await getProfile(role)
+				localStorage.setItem('fullname', profile.fullName || '')
 				setUser(prev => ({
 					...prev,
 					fullName: profile.fullName || prev.fullName,
@@ -73,7 +74,7 @@ export default function Profile() {
 					role,
 				}))
 			} catch (err) {
-				toast.error(err.message || 'Profil ma’lumotlarni olishda xatolik', {
+				toast.error(err.message || 'Profil ma`lumotlarni olishda xatolik', {
 					icon: <AlertCircle className='w-5 h-5 text-red-500' />,
 				})
 				navigate('/auth')
@@ -118,7 +119,7 @@ export default function Profile() {
 		return (
 			<div className='min-h-screen flex items-center justify-center bg-muted p-4 sm:p-6'>
 				<p className='text-forest text-sm sm:text-lg'>
-					Ma’lumotlar yuklanmoqda...
+					Ma`lumotlar yuklanmoqda...
 				</p>
 			</div>
 		)
@@ -140,7 +141,7 @@ export default function Profile() {
 						</Link>
 					</div>
 					<p className='text-xs sm:text-sm text-muted-foreground'>
-						Shaxsiy ma’lumotlaringiz
+						Shaxsiy ma`lumotlaringiz
 					</p>
 				</CardHeader>
 				<CardContent className='space-y-6'>
@@ -149,19 +150,19 @@ export default function Profile() {
 							<span className='w-full sm:w-1/3 font-medium text-forest'>
 								Ism:
 							</span>
-							<span className='text-forest'>{user.fullName || 'Noma’lum'}</span>
+							<span className='text-forest'>{user.fullName || 'Noma`lum'}</span>
 						</div>
 						<div className='flex flex-col sm:flex-row sm:items-center'>
 							<span className='w-full sm:w-1/3 font-medium text-forest'>
 								Email:
 							</span>
-							<span className='text-forest'>{user.email || 'Noma’lum'}</span>
+							<span className='text-forest'>{user.email || 'Noma`lum'}</span>
 						</div>
 						<div className='flex flex-col sm:flex-row sm:items-center'>
 							<span className='w-full sm:w-1/3 font-medium text-forest'>
 								Telefon:
 							</span>
-							<span className='text-forest'>{user.phone || 'Noma’lum'}</span>
+							<span className='text-forest'>{user.phone || 'Noma`lum'}</span>
 						</div>
 						<div className='flex flex-col sm:flex-row sm:items-center'>
 							<span className='w-full sm:w-1/3 font-medium text-forest'>
@@ -174,28 +175,28 @@ export default function Profile() {
 									? 'Sotuvchi'
 									: user.role === 'admin'
 									? 'Admin'
-									: 'Noma’lum'}
+									: 'Noma`lum'}
 							</span>
 						</div>
 						<div className='flex flex-col sm:flex-row sm:items-center'>
 							<span className='w-full sm:w-1/3 font-medium text-forest'>
 								ID:
 							</span>
-							<span className='text-forest'>{user.id || 'Noma’lum'}</span>
+							<span className='text-forest'>{user.id || 'Noma`lum'}</span>
 						</div>
 					</div>
 
 					{user.role === 'seller' && user.sellerInfo && (
 						<div className='border-t pt-4 space-y-2 border-forest/20 text-xs sm:text-sm'>
 							<h3 className='font-semibold text-forest'>
-								Qo`shimcha ma’lumotlar:
+								Qo`shimcha ma`lumotlar:
 							</h3>
 							<div className='flex flex-col sm:flex-row sm:items-center'>
 								<span className='w-full sm:w-1/3 font-medium text-forest'>
 									Biznes nomi:
 								</span>
 								<span className='text-forest'>
-									{user.sellerInfo.businessName || 'Noma’lum'}
+									{user.sellerInfo.businessName || 'Noma`lum'}
 								</span>
 							</div>
 							<div className='flex flex-col sm:flex-row sm:items-center'>
@@ -203,7 +204,7 @@ export default function Profile() {
 									Manzil:
 								</span>
 								<span className='text-forest'>
-									{user.sellerInfo.address || 'Noma’lum'}
+									{user.sellerInfo.address || 'Noma`lum'}
 								</span>
 							</div>
 							<div className='flex flex-col sm:flex-row sm:items-center'>
@@ -213,7 +214,7 @@ export default function Profile() {
 								<span className='text-forest'>
 									{user.sellerInfo.experience
 										? `${user.sellerInfo.experience} yil`
-										: 'Noma’lum'}
+										: 'Noma`lum'}
 								</span>
 							</div>
 						</div>
