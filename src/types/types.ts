@@ -106,6 +106,7 @@ export interface Product {
 		updatedAt: string
 		name: string
 	}
+	saller: Seller
 }
 
 export interface SellerT {
