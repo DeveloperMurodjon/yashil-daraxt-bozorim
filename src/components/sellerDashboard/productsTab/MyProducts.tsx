@@ -129,72 +129,75 @@ const MyProducts: React.FC<MyProductsProps> = ({
 						Mahsulotlar topilmadi
 					</div>
 				) : (
-					products.map(product => (
-						<Card key={product.id} className='shadow-card'>
-							<CardContent className='p-4'>
-								<div className='aspect-square bg-sage/30 rounded-lg mb-4 flex items-center justify-center'>
-									<img
-										src={
-											product.images?.[0]?.ImageUrl || '/placeholder-tree.jpg'
-										}
-										alt={product.name}
-										className='w-full h-full object-cover rounded-lg'
-										onError={e => {
-											e.currentTarget.src = ''
-										}}
-									/>
-								</div>
-								<div className='space-y-2'>
-									<h3 className='font-medium text-forest'>{product.name}</h3>
-									<p className='text-sm text-muted-foreground'>
-										{product.category.name}
-									</p>
-									<div className='flex justify-between items-center'>
-										<span className='font-bold text-forest'>
-											{product.price.toLocaleString()} so'm
-										</span>
-										<Badge
-											variant={product.stock > 0 ? 'default' : 'secondary'}
-										>
-											{product.stock > 0 ? 'Faol' : 'Tugagan'}
-										</Badge>
+					products
+						.slice()
+						.reverse()
+						.map(product => (
+							<Card key={product.id} className='shadow-card'>
+								<CardContent className='p-4'>
+									<div className='aspect-square bg-sage/30 rounded-lg mb-4 flex items-center justify-center'>
+										<img
+											src={
+												product.images?.[0]?.ImageUrl || '/placeholder-tree.jpg'
+											}
+											alt={product.name}
+											className='w-full h-full object-cover rounded-lg'
+											onError={e => {
+												e.currentTarget.src = ''
+											}}
+										/>
 									</div>
-									<p className='text-sm text-muted-foreground'>
-										Omborda: {product.stock} dona
-									</p>
-								</div>
-								<div className='flex space-x-2 mt-4'>
-									<Button
-										size='sm'
-										variant='outline'
-										className='flex-1'
-										onClick={() => handleEdit(product)}
-									>
-										<Edit className='w-4 h-4 mr-1' />
-										Tahrirlash
-									</Button>
-									<Button
-										size='sm'
-										variant='outline'
-										className='flex-1'
-										onClick={() => handleView(product)}
-									>
-										<Eye className='w-4 h-4 mr-1' />
-										Ko`rish
-									</Button>
-									<Button
-										size='sm'
-										variant='destructive'
-										className='flex-1'
-										onClick={() => handleDelete(product.id)}
-									>
-										<Trash2 className='w-4 h-4 mr-1' />
-										O`chirish
-									</Button>
-								</div>
-							</CardContent>
-						</Card>
-					))
+									<div className='space-y-2'>
+										<h3 className='font-medium text-forest'>{product.name}</h3>
+										<p className='text-sm text-muted-foreground'>
+											{product.category.name}
+										</p>
+										<div className='flex justify-between items-center'>
+											<span className='font-bold text-forest'>
+												{product.price.toLocaleString()} so'm
+											</span>
+											<Badge
+												variant={product.stock > 0 ? 'default' : 'secondary'}
+											>
+												{product.stock > 0 ? 'Faol' : 'Tugagan'}
+											</Badge>
+										</div>
+										<p className='text-sm text-muted-foreground'>
+											Omborda: {product.stock} dona
+										</p>
+									</div>
+									<div className='flex space-x-2 mt-4'>
+										<Button
+											size='sm'
+											variant='outline'
+											className='flex-1'
+											onClick={() => handleEdit(product)}
+										>
+											<Edit className='w-4 h-4 mr-1' />
+											Tahrirlash
+										</Button>
+										<Button
+											size='sm'
+											variant='outline'
+											className='flex-1'
+											onClick={() => handleView(product)}
+										>
+											<Eye className='w-4 h-4 mr-1' />
+											Ko`rish
+										</Button>
+										<Button
+											size='sm'
+											variant='destructive'
+											className='flex-1'
+											onClick={() => handleDelete(product.id)}
+										>
+											<Trash2 className='w-4 h-4 mr-1' />
+											O`chirish
+										</Button>
+									</div>
+								</CardContent>
+							</Card>
+						))
 				)}
 			</div>
 		</>

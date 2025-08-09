@@ -91,6 +91,14 @@ const CreateProduct: React.FC<CreateProductProps> = ({
 }) => {
 	const handleChange = (name: string, value: string | File) => {
 		if (value instanceof File) {
+			// Fayl turini tekshirish
+			const allowedTypes = ['image/jpeg', 'image/png', 'image/gif']
+			if (!allowedTypes.includes(value.type)) {
+				toast.error('Faqat JPG, PNG yoki GIF rasmlarni yuklash mumkin', {
+					icon: <AlertCircle className='w-5 h-5 text-red-500' />,
+				})
+				return
+			}
 			const previewUrl = URL.createObjectURL(value)
 			setFormData({ ...formData, imagePreview: previewUrl })
 			setEditableFields({ ...editableFields, images: true })
@@ -134,9 +142,6 @@ const CreateProduct: React.FC<CreateProductProps> = ({
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault()
 		try {
-			const sallerId = localStorage.getItem('userId')
-			if (!sallerId) throw new Error('Sotuvchi ID topilmadi')
-
 			const requiredFields = [
 				'name',
 				'price',
@@ -147,7 +152,7 @@ const CreateProduct: React.FC<CreateProductProps> = ({
 				'categoryId',
 			]
 			if (requiredFields.some(field => !formData[field]?.trim())) {
-				throw new Error('Barcha maydonlarni toldiring')
+				throw new Error('Barcha maydonlarni to‘ldiring')
 			}
 
 			if (!['yes', 'no'].includes(formData.deliveryService)) {
@@ -158,14 +163,21 @@ const CreateProduct: React.FC<CreateProductProps> = ({
 
 			const data = new FormData()
 			for (const key in formData) {
-				if (key !== 'imagePreview' && formData[key])
+				if (key !== 'imagePreview' && formData[key]) {
 					data.append(key, formData[key])
+				}
 			}
-			data.append('sallerId', sallerId)
 			const fileInput = document.querySelector(
 				'input[name="images"]'
 			) as HTMLInputElement
-			if (fileInput?.files?.[0]) data.append('images', fileInput.files[0])
+			if (fileInput?.files?.[0]) {
+				// Fayl turini qayta tekshirish
+				const allowedTypes = ['image/jpeg', 'image/png', 'image/gif']
+				if (!allowedTypes.includes(fileInput.files[0].type)) {
+					throw new Error('Faqat JPG, PNG yoki GIF rasmlarni yuklash mumkin')
+				}
+				data.append('images', fileInput.files[0])
+			}
 
 			// FormData consolling
 			const formDataObject: FormDataObject = {}
@@ -392,7 +404,7 @@ const CreateProduct: React.FC<CreateProductProps> = ({
 										id='product-images'
 										name='images'
 										onChange={e => handleChange('images', e.target.files?.[0])}
-										accept='image/*'
+										accept='image/jpeg,image/png,image/gif'
 										className='hidden'
 									/>
 									<label htmlFor='product-images'>

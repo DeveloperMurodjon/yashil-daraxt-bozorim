@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -75,6 +75,8 @@ const UpdateProduct: React.FC<UpdateProductProps> = ({
 	setProducts,
 	handleCancel,
 }) => {
+	const [loading, setLoading] = useState<{ [key: string]: boolean }>({}) // Har bir maydon uchun loading holati
+
 	const handleInputChange = (
 		e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
 	) => {
@@ -86,6 +88,13 @@ const UpdateProduct: React.FC<UpdateProductProps> = ({
 		const files = e.target.files
 		if (files && files.length > 0) {
 			const file = files[0]
+			const allowedTypes = ['image/jpeg', 'image/png', 'image/gif']
+			if (!allowedTypes.includes(file.type)) {
+				toast.error('Faqat JPG, PNG yoki GIF rasmlarni yuklash mumkin', {
+					icon: <AlertCircle className='w-5 h-5 text-red-500' />,
+				})
+				return
+			}
 			const previewUrl = URL.createObjectURL(file)
 			setFormData({ ...formData, imagePreview: previewUrl })
 			setEditableFields({ ...editableFields, images: true })
@@ -104,6 +113,8 @@ const UpdateProduct: React.FC<UpdateProductProps> = ({
 				})
 				return
 			}
+
+			setLoading(prev => ({ ...prev, [field]: true })) // Loading holatini yoqish
 
 			const data = new FormData()
 			switch (field) {
@@ -135,11 +146,22 @@ const UpdateProduct: React.FC<UpdateProductProps> = ({
 					const fileInput = document.querySelector(
 						'input[name="images"]'
 					) as HTMLInputElement
-					if (fileInput?.files?.length)
-						data.append('images', fileInput.files[0])
+					if (fileInput?.files?.length) {
+						const file = fileInput.files[0]
+						const allowedTypes = ['image/jpeg', 'image/png', 'image/gif']
+						if (!allowedTypes.includes(file.type)) {
+							toast.error('Faqat JPG, PNG yoki GIF rasmlarni yuklash mumkin', {
+								icon: <AlertCircle className='w-5 h-5 text-red-500' />,
+							})
+							setLoading(prev => ({ ...prev, [field]: false }))
+							return
+						}
+						data.append('images', file)
+					}
 					break
 				}
 				default:
+					setLoading(prev => ({ ...prev, [field]: false }))
 					return
 			}
 
@@ -148,12 +170,15 @@ const UpdateProduct: React.FC<UpdateProductProps> = ({
 				icon: <CheckCircle className='w-5 h-5 text-forest' />,
 			})
 			setEditableFields({ ...editableFields, [field]: false })
+			setShowEditProduct(false) // Modalni yopish
 			const updatedProducts = await getMyProducts()
 			setProducts(updatedProducts)
 		} catch (error) {
 			toast.error(`${field} yangilashda xatolik`, {
 				icon: <AlertCircle className='w-5 h-5 text-red-500' />,
 			})
+		} finally {
+			setLoading(prev => ({ ...prev, [field]: false })) // Loading holatini o'chirish
 		}
 	}
 
@@ -191,15 +216,19 @@ const UpdateProduct: React.FC<UpdateProductProps> = ({
 										/>
 									)}
 								</div>
-								<div className='flex space-x-2 ml-2 Ascendingly small'>
+								<div className='flex space-x-2 ml-2'>
 									{editableFields.name ? (
 										<Button
 											type='button'
 											variant='ghost'
 											size='sm'
 											onClick={() => handleFieldSave('name')}
+											disabled={loading.name}
 											className='ml-2'
 										>
+											{loading.name ? (
+												<span className='animate-spin mr-2'>⏳</span>
+											) : null}
 											Saqlash
 										</Button>
 									) : (
@@ -244,7 +273,11 @@ const UpdateProduct: React.FC<UpdateProductProps> = ({
 											variant='ghost'
 											size='sm'
 											onClick={() => handleFieldSave('price')}
+											disabled={loading.price}
 										>
+											{loading.price ? (
+												<span className='animate-spin mr-2'>⏳</span>
+											) : null}
 											Saqlash
 										</Button>
 									) : (
@@ -298,7 +331,11 @@ const UpdateProduct: React.FC<UpdateProductProps> = ({
 											variant='ghost'
 											size='sm'
 											onClick={() => handleFieldSave('deliveryService')}
+											disabled={loading.deliveryService}
 										>
+											{loading.deliveryService ? (
+												<span className='animate-spin mr-2'>⏳</span>
+											) : null}
 											Saqlash
 										</Button>
 									) : (
@@ -342,7 +379,11 @@ const UpdateProduct: React.FC<UpdateProductProps> = ({
 											variant='ghost'
 											size='sm'
 											onClick={() => handleFieldSave('stock')}
+											disabled={loading.stock}
 										>
+											{loading.stock ? (
+												<span className='animate-spin mr-2'>⏳</span>
+											) : null}
 											Saqlash
 										</Button>
 									) : (
@@ -388,7 +429,11 @@ const UpdateProduct: React.FC<UpdateProductProps> = ({
 											variant='ghost'
 											size='sm'
 											onClick={() => handleFieldSave('height')}
+											disabled={loading.height}
 										>
+											{loading.height ? (
+												<span className='animate-spin mr-2'>⏳</span>
+											) : null}
 											Saqlash
 										</Button>
 									) : (
@@ -432,7 +477,11 @@ const UpdateProduct: React.FC<UpdateProductProps> = ({
 											variant='ghost'
 											size='sm'
 											onClick={() => handleFieldSave('age')}
+											disabled={loading.age}
 										>
+											{loading.age ? (
+												<span className='animate-spin mr-2'>⏳</span>
+											) : null}
 											Saqlash
 										</Button>
 									) : (
@@ -477,7 +526,11 @@ const UpdateProduct: React.FC<UpdateProductProps> = ({
 											variant='ghost'
 											size='sm'
 											onClick={() => handleFieldSave('region')}
+											disabled={loading.region}
 										>
+											{loading.region ? (
+												<span className='animate-spin mr-2'>⏳</span>
+											) : null}
 											Saqlash
 										</Button>
 									) : (
@@ -530,7 +583,11 @@ const UpdateProduct: React.FC<UpdateProductProps> = ({
 											variant='ghost'
 											size='sm'
 											onClick={() => handleFieldSave('categoryId')}
+											disabled={loading.categoryId}
 										>
+											{loading.categoryId ? (
+												<span className='animate-spin mr-2'>⏳</span>
+											) : null}
 											Saqlash
 										</Button>
 									) : (
@@ -570,7 +627,7 @@ const UpdateProduct: React.FC<UpdateProductProps> = ({
 											id='product-images'
 											name='images'
 											onChange={handleFileChange}
-											accept='image/*'
+											accept='image/jpeg,image/png,image/gif'
 											className='hidden'
 										/>
 										<label htmlFor='product-images'>
@@ -587,7 +644,11 @@ const UpdateProduct: React.FC<UpdateProductProps> = ({
 											variant='ghost'
 											size='sm'
 											onClick={() => handleFieldSave('images')}
+											disabled={loading.images}
 										>
+											{loading.images ? (
+												<span className='animate-spin mr-2'>⏳</span>
+											) : null}
 											Saqlash
 										</Button>
 									) : (
