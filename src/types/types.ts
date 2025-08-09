@@ -49,25 +49,6 @@ export interface UpdateSellerProfilePayload {
 	experience?: string
 }
 
-export interface Product {
-	id: number
-	name: string
-	price: number
-	stock: number
-	height: number
-	age: number
-	region: string
-	deliveryService: string
-	category: {
-		id: number
-		createdAt: string
-		updatedAt: string
-		name: string
-	}
-	images: Image[]
-	saller: Seller
-}
-
 export interface Order {
 	id: number
 	createdAt: string
@@ -100,6 +81,33 @@ export interface Order {
 	}
 }
 
+export interface Image {
+	id: number
+	createdAt: string
+	updatedAt: string
+	ImageUrl: string
+}
+
+export interface Product {
+	id: number
+	createdAt: string
+	updatedAt: string
+	name: string
+	price: number
+	deliveryService: string
+	stock: number
+	height: number
+	age: number
+	region: string
+	images?: Image[]
+	category: {
+		id: number
+		createdAt: string
+		updatedAt: string
+		name: string
+	}
+}
+
 export interface SellerT {
 	id?: number
 	fullName: string
@@ -110,8 +118,11 @@ export interface SellerT {
 	experience: string
 	role?: string
 	password?: string
+	accountStatus?: string
+	products?: Product[]
 }
 
+// Boshqa interfeyslar (agar mavjud bo‘lsa) o‘zgarishsiz qoladi
 export interface UserT {
 	id: number
 	fullName: string

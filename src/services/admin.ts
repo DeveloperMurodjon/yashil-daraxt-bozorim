@@ -9,6 +9,7 @@ export const getAllUsers = async (): Promise<UserT[]> => {
 	})
 	return res.data
 }
+
 export const getAllSellers = async (): Promise<SellerT[]> => {
 	const res = await api.get('/admin/get-all-sallers', {
 		headers: { Authorization: `Bearer ${token}` },
@@ -49,6 +50,12 @@ export const deleteUser = async (id: number) => {
 
 export const deleteSeller = async (id: number) => {
 	await api.delete(`/admin/delete-saller/${id}`, {
+		headers: { Authorization: `Bearer ${token}` },
+	})
+}
+
+export const deleteProduct = async (id: number) => {
+	await api.delete(`/admin/delete-product/${id}`, {
 		headers: { Authorization: `Bearer ${token}` },
 	})
 }
