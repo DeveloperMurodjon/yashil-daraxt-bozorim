@@ -7,7 +7,6 @@ import Index from './pages/Index'
 import Auth from './pages/Auth'
 import SellerDashboard from './pages/SellerDashboard'
 import NotFound from './pages/NotFound'
-import Profile from './pages/Profile'
 import AdminLogin from './pages/AdminLogin'
 import AdminDashboard from './pages/AdminDashboard'
 import UserDashboard from './pages/UserDashboard'
@@ -44,7 +43,6 @@ const App = () => (
 					<Route path='/auth' element={<Auth />} />
 					<Route path='/seller-dashboard' element={<SellerDashboard />} />
 					<Route path='/user-dashboard' element={<UserDashboard />} />
-					<Route path='/profile' element={<Profile />} />
 					<Route path='/admin' element={<AdminLogin />} />
 					<Route
 						path='/admin/dashboard'

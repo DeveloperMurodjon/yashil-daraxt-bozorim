@@ -4,7 +4,11 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { EyeIcon, EyeOffIcon, CheckCircle, AlertCircle } from 'lucide-react'
 import { toast } from 'react-toastify'
-import { loginUser, requestOtp } from '@/services/auth'
+import {
+	loginUser,
+	requestForgotPasswordOtp,
+	resetPassword,
+} from '@/services/auth'
 import { RoleType } from '@/services/auth'
 
 interface ErrorState {
@@ -12,7 +16,8 @@ interface ErrorState {
 	email: string
 	phone: string
 	password: string
-	otp: string
+	confirmPassword?: string
+	otp?: string
 }
 
 interface LoginProps {
@@ -24,15 +29,25 @@ export default function Login({ role, RoleSelector }: LoginProps) {
 	const navigate = useNavigate()
 	const [email, setEmail] = useState('')
 	const [password, setPassword] = useState('')
-	const [otp, setOtp] = useState(['', '', '', '', '', ''])
 	const [showPassword, setShowPassword] = useState(false)
 	const [loading, setLoading] = useState(false)
 	const [resendTimer, setResendTimer] = useState(0)
+	const [isForgotPasswordModalOpen, setIsForgotPasswordModalOpen] =
+		useState(false)
+	const [isResetPasswordModalOpen, setIsResetPasswordModalOpen] =
+		useState(false)
+	const [forgotPasswordEmail, setForgotPasswordEmail] = useState('')
+	const [otp, setOtp] = useState('')
+	const [newPassword, setNewPassword] = useState('')
+	const [confirmPassword, setConfirmPassword] = useState('')
+	const [showNewPassword, setShowNewPassword] = useState(false)
+	const [showConfirmPassword, setShowConfirmPassword] = useState(false)
 	const [errors, setErrors] = useState<ErrorState>({
 		fullName: '',
 		email: '',
 		phone: '',
 		password: '',
+		confirmPassword: '',
 		otp: '',
 	})
 
@@ -43,7 +58,7 @@ export default function Login({ role, RoleSelector }: LoginProps) {
 		return () => clearInterval(timer)
 	}, [resendTimer])
 
-	const validate = (): boolean => {
+	const validateLogin = (): boolean => {
 		const e: ErrorState = {
 			fullName: '',
 			email: !email
@@ -57,73 +72,57 @@ export default function Login({ role, RoleSelector }: LoginProps) {
 				: password.length < 6
 				? 'Parol 6 ta belgidan ko`p bo`lishi kerak'
 				: '',
-			otp: otp.join('').length !== 6 ? '6 raqamli OTP kod kerak' : '',
 		}
 		setErrors(e)
 		return Object.values(e).every(val => val === '')
 	}
 
-	const handleOtpChange = (index: number, value: string) => {
-		if (/^\d?$/.test(value)) {
-			const newOtp = [...otp]
-			newOtp[index] = value
-			setOtp(newOtp)
-			if (value && index < 5)
-				document.getElementById(`otp-${index + 1}`)?.focus()
-			else if (!value && index > 0)
-				document.getElementById(`otp-${index - 1}`)?.focus()
+	const validateForgotPasswordEmail = (): boolean => {
+		const e: ErrorState = {
+			fullName: '',
+			email: !forgotPasswordEmail
+				? 'Email kerak'
+				: !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(forgotPasswordEmail)
+				? 'Email noto`g`ri formatda'
+				: '',
+			phone: '',
+			password: '',
 		}
+		setErrors(e)
+		return Object.values(e).every(val => val === '')
 	}
 
-	const handleOtpKeyDown = (
-		index: number,
-		e: React.KeyboardEvent<HTMLInputElement>
-	) => {
-		if (e.key === 'Backspace' && !otp[index] && index > 0) {
-			e.preventDefault()
-			document.getElementById(`otp-${index - 1}`)?.focus()
+	const validateResetPassword = (): boolean => {
+		const passwordRegex =
+			/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/
+		const e: ErrorState = {
+			fullName: '',
+			email: '',
+			phone: '',
+			password: !newPassword
+				? 'Yangi parol kerak'
+				: !passwordRegex.test(newPassword)
+				? 'Parol kamida 8 belgi, 1 katta harf, 1 kichik harf, 1 raqam va 1 maxsus belgi bo`lishi kerak'
+				: '',
+			confirmPassword:
+				newPassword !== confirmPassword ? 'Parollar mos kelmaydi' : '',
+			otp: !otp
+				? 'OTP kod kerak'
+				: otp.length !== 6
+				? 'OTP kod 6 ta raqam bo`lishi kerak'
+				: '',
 		}
-	}
-
-	const handleRequestOtp = async () => {
-		if (!email) {
-			toast.error('Email kiriting', {
-				icon: <AlertCircle className='w-5 h-5 text-red-500' />,
-			})
-			return
-		}
-		setLoading(true)
-		try {
-			await requestOtp({ email }, role)
-			toast.success('OTP kod muvaffaqiyatli yuborildi!', {
-				icon: <CheckCircle className='w-5 h-5 text-forest' />,
-			})
-			setResendTimer(60)
-		} catch (err) {
-			const errorMsg =
-				err.response?.data?.error?.message || 'OTP yuborishda xatolik'
-			if (errorMsg === 'Foydalanuvchi topilmadi') {
-				toast.success('OTP kod yuborildi, hisobni tekshiring!', {
-					icon: <CheckCircle className='w-5 h-5 text-forest' />,
-				})
-				setResendTimer(60)
-			} else {
-				toast.error(errorMsg, {
-					icon: <AlertCircle className='w-5 h-5 text-red-500' />,
-				})
-			}
-		} finally {
-			setLoading(false)
-		}
+		setErrors(e)
+		return Object.values(e).every(val => val === '')
 	}
 
 	const handleLogin = async (e: FormEvent) => {
 		e.preventDefault()
-		if (!validate()) return
+		if (!validateLogin()) return
 		setLoading(true)
 		try {
 			localStorage.clear()
-			const data = await loginUser({ email, password, otp: otp.join('') }, role)
+			const data = await loginUser({ email, password }, role)
 			localStorage.setItem('access_token', data.access_token || data.token)
 			localStorage.setItem('userId', String(data.userId || data.id || ''))
 			localStorage.setItem('email', data.email || '')
@@ -131,7 +130,14 @@ export default function Login({ role, RoleSelector }: LoginProps) {
 			toast.success('Tizimga muvaffaqiyatli kirdingiz!', {
 				icon: <CheckCircle className='w-5 h-5 text-forest' />,
 			})
-			navigate('/profile')
+
+			navigate(
+				role == 'seller'
+					? '/seller-dashboard?tab=profile'
+					: role == 'user'
+					? '/user-dashboard?tab=profile'
+					: '/'
+			)
 		} catch (err) {
 			toast.error(
 				err.response?.data?.error?.message || 'Login qilishda xatolik',
@@ -142,92 +148,271 @@ export default function Login({ role, RoleSelector }: LoginProps) {
 		}
 	}
 
+	const handleRequestForgotPasswordOtp = async (e: FormEvent) => {
+		e.preventDefault()
+		if (!validateForgotPasswordEmail()) return
+		setLoading(true)
+		try {
+			await requestForgotPasswordOtp({ email: forgotPasswordEmail }, role)
+			toast.success('OTP kod emailga yuborildi!', {
+				icon: <CheckCircle className='w-5 h-5 text-forest' />,
+			})
+			setResendTimer(60)
+			setIsForgotPasswordModalOpen(false)
+			setIsResetPasswordModalOpen(true)
+		} catch (err) {
+			toast.error(
+				err.response?.data?.error?.message || 'OTP yuborishda xatolik',
+				{ icon: <AlertCircle className='w-5 h-5 text-red-500' /> }
+			)
+		} finally {
+			setLoading(false)
+		}
+	}
+
+	const handleResetPassword = async (e: FormEvent) => {
+		e.preventDefault()
+		if (!validateResetPassword()) return
+		setLoading(true)
+		try {
+			await resetPassword(
+				{ email: forgotPasswordEmail, password: newPassword, otp },
+				role
+			)
+			toast.success('Parol muvaffaqiyatli yangilandi!', {
+				icon: <CheckCircle className='w-5 h-5 text-forest' />,
+			})
+			setIsResetPasswordModalOpen(false)
+			setForgotPasswordEmail('')
+			setOtp('')
+			setNewPassword('')
+			setConfirmPassword('')
+		} catch (err) {
+			toast.error(
+				err.response?.data?.error?.message || 'Parolni yangilashda xatolik',
+				{ icon: <AlertCircle className='w-5 h-5 text-red-500' /> }
+			)
+		} finally {
+			setLoading(false)
+		}
+	}
+
 	return (
-		<form onSubmit={handleLogin} className='space-y-6'>
-			<h2 className='text-xl font-bold text-forest'>Kirish</h2>
-			<RoleSelector />
-			<div>
-				<label className='text-sm font-medium text-forest'>Email</label>
-				<Input
-					placeholder='Email'
-					value={email}
-					onChange={e => setEmail(e.target.value)}
-					className='mt-1'
-				/>
-				{errors.email && (
-					<p className='text-red-500 text-sm mt-1'>{errors.email}</p>
-				)}
-			</div>
-			<div className='relative'>
-				<label className='text-sm font-medium text-forest'>Parol</label>
-				<Input
-					type={showPassword ? 'text' : 'password'}
-					placeholder='Parol'
-					value={password}
-					onChange={e => setPassword(e.target.value)}
-					className='mt-1'
-				/>
-				<button
-					type='button'
-					onClick={() => setShowPassword(prev => !prev)}
-					className='absolute right-2 top-[42px] -translate-y-1/2'
-				>
-					{showPassword ? (
-						<EyeOffIcon className='w-5 h-5 text-forest' />
-					) : (
-						<EyeIcon className='w-5 h-5 text-forest' />
+		<div className='relative'>
+			<form onSubmit={handleLogin} className='space-y-6'>
+				<h2 className='text-xl font-bold text-forest'>Kirish</h2>
+				<RoleSelector />
+				<div>
+					<label className='text-sm font-medium text-forest'>Email</label>
+					<Input
+						placeholder='Email'
+						value={email}
+						onChange={e => setEmail(e.target.value)}
+						className='mt-1'
+					/>
+					{errors.email && (
+						<p className='text-red-500 text-sm mt-1'>{errors.email}</p>
 					)}
-				</button>
-				{errors.password && (
-					<p className='text-red-500 text-sm mt-1'>{errors.password}</p>
-				)}
-			</div>
-			<div>
-				<label className='text-sm font-medium text-forest'>OTP kod</label>
-				<div className='flex gap-2 mt-1'>
-					{otp.map((digit, index) => (
-						<Input
-							key={index}
-							id={`otp-${index}`}
-							type='text'
-							maxLength={1}
-							value={digit}
-							onChange={e => handleOtpChange(index, e.target.value)}
-							onKeyDown={e => handleOtpKeyDown(index, e)}
-							className='w-10 h-10 text-center text-lg border-forest/20'
-						/>
-					))}
 				</div>
-				{errors.otp && (
-					<p className='text-red-500 text-sm mt-1'>{errors.otp}</p>
-				)}
-			</div>
-			<div className='flex justify-between items-center'>
+				<div className='relative'>
+					<label className='text-sm font-medium text-forest'>Parol</label>
+					<Input
+						type={showPassword ? 'text' : 'password'}
+						placeholder='Parol'
+						value={password}
+						onChange={e => setPassword(e.target.value)}
+						className='mt-1'
+					/>
+					<button
+						type='button'
+						onClick={() => setShowPassword(prev => !prev)}
+						className='absolute right-2 top-[42px] -translate-y-1/2'
+					>
+						{showPassword ? (
+							<EyeOffIcon className='w-5 h-5 text-forest' />
+						) : (
+							<EyeIcon className='w-5 h-5 text-forest' />
+						)}
+					</button>
+					{errors.password && (
+						<p className='text-red-500 text-sm mt-1'>{errors.password}</p>
+					)}
+				</div>
+				<div className='text-right'>
+					<button
+						type='button'
+						onClick={() => setIsForgotPasswordModalOpen(true)}
+						className='text-sm text-forest hover:underline'
+					>
+						Parolni unutdingizmi?
+					</button>
+				</div>
 				<Button
-					type='button'
-					onClick={handleRequestOtp}
-					className='bg-sage/20 text-forest border border-forest/20 hover:bg-sage/50'
-					disabled={loading || resendTimer > 0}
+					type='submit'
+					className='w-full bg-gradient-to-r from-forest to-moss text-white'
+					disabled={loading}
 				>
-					{loading
-						? 'Yuborilmoqda...'
-						: resendTimer > 0
-						? `Qayta yuborish (${resendTimer}s)`
-						: 'OTP yuborish'}
+					{loading ? 'Kirish...' : 'Kirish'}
 				</Button>
-				{resendTimer > 0 && (
-					<p className='text-sm text-forest'>
-						Qayta yuborish {resendTimer} soniyadan keyin
-					</p>
-				)}
-			</div>
-			<Button
-				type='submit'
-				className='w-full bg-gradient-to-r from-forest to-moss text-white'
-				disabled={loading}
-			>
-				{loading ? 'Kirish...' : 'Kirish'}
-			</Button>
-		</form>
+			</form>
+
+			{isForgotPasswordModalOpen && (
+				<div className='fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50'>
+					<div className='bg-white p-6 rounded-lg shadow-lg max-w-md w-full'>
+						<h3 className='text-lg font-bold text-forest mb-4'>
+							Parolni tiklash
+						</h3>
+						<form
+							onSubmit={handleRequestForgotPasswordOtp}
+							className='space-y-4'
+						>
+							<div>
+								<label className='text-sm font-medium text-forest'>Email</label>
+								<Input
+									placeholder='Email'
+									value={forgotPasswordEmail}
+									onChange={e => setForgotPasswordEmail(e.target.value)}
+									className='mt-1'
+								/>
+								{errors.email && (
+									<p className='text-red-500 text-sm mt-1'>{errors.email}</p>
+								)}
+							</div>
+							<div className='flex justify-end gap-2'>
+								<Button
+									type='button'
+									onClick={() => setIsForgotPasswordModalOpen(false)}
+									className='bg-gray-200 text-forest'
+								>
+									Bekor qilish
+								</Button>
+								<Button
+									type='submit'
+									className='bg-gradient-to-r from-forest to-moss text-white'
+									disabled={loading}
+								>
+									{loading ? 'Yuborilmoqda...' : 'OTP yuborish'}
+								</Button>
+							</div>
+						</form>
+					</div>
+				</div>
+			)}
+
+			{isResetPasswordModalOpen && (
+				<div className='fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50'>
+					<div className='bg-white p-6 rounded-lg shadow-lg max-w-md w-full'>
+						<h3 className='text-lg font-bold text-forest mb-4'>
+							Yangi parol o'rnatish
+						</h3>
+						<form onSubmit={handleResetPassword} className='space-y-4'>
+							<div>
+								<label className='text-sm font-medium text-forest'>
+									Emailga kelgan kodni kiriting{' '}
+								</label>
+								<Input
+									placeholder='Emailga kelgan kod'
+									value={otp}
+									onChange={e => setOtp(e.target.value)}
+									className='mt-1'
+								/>
+								{errors.otp && (
+									<p className='text-red-500 text-sm mt-1'>{errors.otp}</p>
+								)}
+							</div>
+							<div className='relative'>
+								<label className='text-sm font-medium text-forest'>
+									Yangi parol
+								</label>
+								<Input
+									type={showNewPassword ? 'text' : 'password'}
+									placeholder='Yangi parol'
+									value={newPassword}
+									onChange={e => setNewPassword(e.target.value)}
+									className='mt-1'
+								/>
+								<button
+									type='button'
+									onClick={() => setShowNewPassword(prev => !prev)}
+									className='absolute right-2 top-[42px] -translate-y-1/2'
+								>
+									{showNewPassword ? (
+										<EyeOffIcon className='w-5 h-5 text-forest' />
+									) : (
+										<EyeIcon className='w-5 h-5 text-forest' />
+									)}
+								</button>
+								{errors.password && (
+									<p className='text-red-500 text-sm mt-1'>{errors.password}</p>
+								)}
+							</div>
+							<div className='relative'>
+								<label className='text-sm font-medium text-forest'>
+									Parolni tasdiqlash
+								</label>
+								<Input
+									type={showConfirmPassword ? 'text' : 'password'}
+									placeholder='Parolni tasdiqlash'
+									value={confirmPassword}
+									onChange={e => setConfirmPassword(e.target.value)}
+									className='mt-1'
+								/>
+								<button
+									type='button'
+									onClick={() => setShowConfirmPassword(prev => !prev)}
+									className='absolute right-2 top-[42px] -translate-y-1/2'
+								>
+									{showConfirmPassword ? (
+										<EyeOffIcon className='w-5 h-5 text-forest' />
+									) : (
+										<EyeIcon className='w-5 h-5 text-forest' />
+									)}
+								</button>
+								{errors.confirmPassword && (
+									<p className='text-red-500 text-sm mt-1'>
+										{errors.confirmPassword}
+									</p>
+								)}
+							</div>
+							<div className='flex justify-between items-center'>
+								<Button
+									type='button'
+									onClick={handleRequestForgotPasswordOtp}
+									className='bg-sage/20 text-forest border border-forest/20 hover:bg-sage/50'
+									disabled={loading || resendTimer > 0}
+								>
+									{loading
+										? 'Yuborilmoqda...'
+										: resendTimer > 0
+										? `Qayta yuborish (${resendTimer}s)`
+										: 'OTP qayta yuborish'}
+								</Button>
+								{resendTimer > 0 && (
+									<p className='text-sm text-forest'>
+										Qayta yuborish {resendTimer} soniyadan keyin
+									</p>
+								)}
+							</div>
+							<div className='flex justify-end gap-2'>
+								<Button
+									type='button'
+									onClick={() => setIsResetPasswordModalOpen(false)}
+									className='bg-gray-200 text-forest'
+								>
+									Bekor qilish
+								</Button>
+								<Button
+									type='submit'
+									className='bg-gradient-to-r from-forest to-moss text-white'
+									disabled={loading}
+								>
+									{loading ? 'Yangilash...' : 'Parolni o`zgartirish'}
+								</Button>
+							</div>
+						</form>
+					</div>
+				</div>
+			)}
+		</div>
 	)
 }

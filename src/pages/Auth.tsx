@@ -1,6 +1,6 @@
-import { useState } from 'react'
-import { Link } from 'react-router-dom'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { useState, useEffect } from 'react'
+import { Link, useSearchParams } from 'react-router-dom'
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
 import { ArrowLeft, User, Store } from 'lucide-react'
 import Register from '@/components/Register'
 import Login from '@/components/Login'
@@ -9,8 +9,20 @@ import { RoleType } from '@/services/auth'
 type TabType = 'register' | 'login'
 
 export default function Auth() {
-	const [tab, setTab] = useState<TabType>('register')
-	const [role, setRole] = useState<RoleType>('user')
+	const [searchParams, setSearchParams] = useSearchParams()
+	const [tab, setTab] = useState<TabType>(
+		searchParams.get('tab') === 'register' ? 'register' : 'login'
+	)
+	const [role, setRole] = useState<RoleType>(
+		(searchParams.get('role') === 'seller' ? 'seller' : 'user') as RoleType
+	)
+
+	useEffect(() => {
+		const newTab = searchParams.get('tab') === 'register' ? 'register' : 'login'
+		const newRole = searchParams.get('role') === 'seller' ? 'seller' : 'user'
+		setTab(newTab)
+		setRole(newRole)
+	}, [searchParams])
 
 	const RoleSelector = () => (
 		<div className='flex gap-2'>

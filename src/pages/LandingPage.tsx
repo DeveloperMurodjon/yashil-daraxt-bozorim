@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import {
 	Card,
@@ -21,7 +22,6 @@ import {
 	Clock,
 	Heart,
 } from 'lucide-react'
-import { useNavigate } from 'react-router-dom'
 import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
 
@@ -29,6 +29,7 @@ const LandingPage = () => {
 	const navigate = useNavigate()
 	const role = localStorage.getItem('role')
 	const isAuthenticated = !!localStorage.getItem('access_token')
+
 	const handleViewTreesClick = () => {
 		if (!isAuthenticated) {
 			navigate('/auth')
@@ -40,7 +41,7 @@ const LandingPage = () => {
 	}
 
 	const handleBecomeSellerClick = () => {
-		navigate('/auth', { state: { defaultRole: 'seller' } })
+		navigate('/auth?tab=register&role=seller')
 	}
 
 	const features = [
@@ -129,31 +130,26 @@ const LandingPage = () => {
 	return (
 		<div className='min-h-screen'>
 			<Navbar />
-
 			{/* Hero Section */}
 			<section className='relative min-h-screen flex items-center bg-gradient-to-br from-sage via-accent to-background overflow-hidden pt-16'>
 				<div className='absolute inset-0 z-0'>
 					<div className='absolute inset-0 bg-gradient-to-r from-forest/20 via-forest/10 to-transparent'></div>
 				</div>
-
 				<div className='container mx-auto px-4 relative z-10'>
 					<div className='text-center space-y-8 max-w-4xl mx-auto'>
 						<Badge className='bg-forest/10 text-forest border-forest/20 px-4 py-2'>
 							O'zbekistonning Eng Yirik Ko'chatlar Bozori
 						</Badge>
-
 						<h1 className='text-4xl md:text-6xl lg:text-7xl font-bold text-foreground leading-tight'>
 							Daraxt Ko'chatlari
 							<span className='block text-forest bg-gradient-to-r from-forest to-moss bg-clip-text'>
 								Bozori
 							</span>
 						</h1>
-
 						<p className='text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto'>
 							Minglab sifatli ko'chatlar, yuzlab ishonchli sotuvchilar. Tabiatni
 							o'zingiz bilan birga o'stirishni boshlang.
 						</p>
-
 						<div className='flex flex-col sm:flex-row gap-4 justify-center max-w-md mx-auto'>
 							<Button
 								size='lg'
@@ -174,7 +170,6 @@ const LandingPage = () => {
 								Sotuvchi Bo'lish
 							</Button>
 						</div>
-
 						{/* Stats */}
 						<div className='grid grid-cols-2 md:grid-cols-4 gap-6 mt-16'>
 							{stats.map((stat, index) => (
@@ -191,7 +186,6 @@ const LandingPage = () => {
 					</div>
 				</div>
 			</section>
-
 			{/* Features Section */}
 			<section className='py-20 bg-card'>
 				<div className='container mx-auto px-4'>
@@ -204,7 +198,6 @@ const LandingPage = () => {
 							savdo platformasi
 						</p>
 					</div>
-
 					<div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8'>
 						{features.map((feature, index) => (
 							<Card
@@ -225,7 +218,6 @@ const LandingPage = () => {
 					</div>
 				</div>
 			</section>
-
 			{/* How It Works Section */}
 			<section className='py-20 bg-gradient-to-br from-sage via-accent to-background'>
 				<div className='container mx-auto px-4'>
@@ -237,7 +229,6 @@ const LandingPage = () => {
 							4 ta oddiy qadam bilan ko'chatlar sotib oling yoki soting
 						</p>
 					</div>
-
 					<div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8'>
 						{howItWorks.map((step, index) => (
 							<div key={index} className='text-center'>
@@ -260,7 +251,6 @@ const LandingPage = () => {
 					</div>
 				</div>
 			</section>
-
 			{/* Testimonials Section */}
 			<section className='py-20 bg-card'>
 				<div className='container mx-auto px-4'>
@@ -272,7 +262,6 @@ const LandingPage = () => {
 							Bizning xizmatimizdan foydalanganlar nima deyishadi
 						</p>
 					</div>
-
 					<div className='grid grid-cols-1 md:grid-cols-3 gap-8'>
 						{testimonials.map((testimonial, index) => (
 							<Card key={index} className='shadow-card'>
@@ -299,7 +288,6 @@ const LandingPage = () => {
 					</div>
 				</div>
 			</section>
-
 			{/* CTA Section */}
 			<section className='py-20 bg-gradient-to-r from-forest to-moss text-primary-foreground'>
 				<div className='container mx-auto px-4 text-center'>
@@ -332,7 +320,6 @@ const LandingPage = () => {
 					</div>
 				</div>
 			</section>
-
 			<Footer />
 		</div>
 	)

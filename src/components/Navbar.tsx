@@ -139,7 +139,15 @@ const Navbar = () => {
 						</Link>
 
 						{isLoggedIn ? (
-							<Link to='/profile'>
+							<Link
+								to={
+									role === 'user'
+										? '/user-dashboard?tab=profile'
+										: role === 'seller'
+										? '/seller-dashboard?tab=profile'
+										: '/'
+								}
+							>
 								<Button className='bg-gradient-to-r from-forest to-moss'>
 									Profil
 								</Button>
@@ -237,7 +245,16 @@ const Navbar = () => {
 								</Link>
 
 								{isLoggedIn ? (
-									<Link to='/profile' onClick={() => setIsMenuOpen(false)}>
+									<Link
+										to={
+											role === 'seller'
+												? '/seller-dashboard?tab=profile'
+												: role === 'user'
+												? '/user-dashboard?tab=profile'
+												: ''
+										}
+										onClick={() => setIsMenuOpen(false)}
+									>
 										<Button variant='outline' className='w-full justify-start'>
 											<User className='h-4 w-4 mr-2' />
 											Profil

@@ -1,5 +1,5 @@
 import { api } from '@/lib/api'
-import { toast } from 'react-toastify' // Siz ishlatayotgan toast kutubxonasiga moslashtiring
+import { toast } from 'react-toastify'
 
 // Role types
 export type RoleType = 'user' | 'seller'
@@ -13,11 +13,22 @@ interface RegisterPayload {
 	experience?: string
 	addres?: string
 }
-
+interface SignInT {
+	email: string
+	otp: string
+}
 interface SellerInfo {
 	businessName: string
 	addres: string
 	experience: string
+}
+interface ForgotPasswordPayload {
+	email: string
+}
+interface ResetPasswordPayload {
+	email: string
+	password: string
+	otp: string
 }
 
 export interface UserProfile {
@@ -92,7 +103,6 @@ export async function registerUser(data: RegisterPayload, type: RoleType) {
 	const endpoint = type === 'seller' ? '/saller/register' : '/user/register'
 	try {
 		const res = await api.post(endpoint, data)
-		if (!res.data?.id) throw new Error('Foydalanuvchi ID topilmadi')
 
 		const userData: Partial<UserProfile> & { token?: string } = {
 			...data,
@@ -110,7 +120,7 @@ export async function registerUser(data: RegisterPayload, type: RoleType) {
 		saveUserData(userData)
 		return res.data
 	} catch (error) {
-		console.error("Foydalanuvchi ro'yxatdan o'tkazishda xato:", {
+		console.error({
 			message: error.message,
 			response: error.response?.data || error.response,
 			status: error.response?.status,
@@ -118,6 +128,36 @@ export async function registerUser(data: RegisterPayload, type: RoleType) {
 		throw new Error(
 			getErrorMessage(error) || "Ro'yxatdan o'tishda xato yuz berdi"
 		)
+	}
+}
+
+// Confirm SignIn
+export async function confirmSignIn(data: SignInT, type: RoleType) {
+	const endpoint =
+		type === 'seller'
+			? '/auth/saller/confirm-signin'
+			: type === 'user'
+			? '/auth/user/confirm-signin'
+			: ''
+	try {
+		const res = await api.post(endpoint, data)
+		const token = res.data.access_token
+		if (!token) throw new Error('Token topilmadi')
+
+		saveUserData({
+			email: data.email,
+			role: type,
+			token,
+			id: res.data.id || res.data.userId,
+		})
+		return res.data
+	} catch (error) {
+		console.log('Ro`yxatdan o`tishda xato', {
+			message: error.message,
+			response: error.response?.data || error.response,
+			status: error.response?.status,
+		})
+		throw new Error(getErrorMessage(error) || 'Kirishda xato yuz berdi')
 	}
 }
 
@@ -138,18 +178,64 @@ export async function requestOtp(data: { email: string }, type: RoleType) {
 	}
 }
 
+// Forgot Password OTP request
+export async function requestForgotPasswordOtp(
+	data: ForgotPasswordPayload,
+	type: RoleType
+) {
+	const endpoint =
+		type === 'seller'
+			? '/auth/saller/forgot-password'
+			: '/auth/user/forgot-password'
+	try {
+		const res = await api.post(endpoint, data)
+		return res.data
+	} catch (error) {
+		console.error("Parolni tiklash OTP so'rashda xato:", {
+			message: error.message,
+			response: error.response?.data || error.response,
+			status: error.response?.status,
+		})
+		throw new Error(
+			getErrorMessage(error) || "Parolni tiklash OTP so'rashda xato yuz berdi"
+		)
+	}
+}
+
+// Reset Password
+export async function resetPassword(
+	data: ResetPasswordPayload,
+	type: RoleType
+) {
+	const endpoint =
+		type === 'seller'
+			? '/auth/saller/reset-password'
+			: '/auth/user/reset-password'
+	try {
+		const res = await api.post(endpoint, data)
+		return res.data
+	} catch (error) {
+		console.error('Parolni yangilashda xato:', {
+			message: error.message,
+			response: error.response?.data || error.response,
+			status: error.response?.status,
+		})
+		throw new Error(
+			getErrorMessage(error) || 'Parolni yangilashda xato yuz berdi'
+		)
+	}
+}
+
 // Login
 export async function loginUser(
-	data: { email: string; password: string; otp: string },
+	data: { email: string; password: string },
 	type: RoleType
 ) {
 	const endpoint = type === 'seller' ? '/auth/saller/login' : '/auth/user/login'
 	try {
 		const res = await api.post(endpoint, data)
-		const token = res.data.token || res.data.access_token
+		const token = res.data.access_token
 		if (!token) throw new Error('Token topilmadi')
-		if (!res.data.id && !res.data.userId)
-			throw new Error('Foydalanuvchi ID topilmadi')
 
 		saveUserData({
 			email: data.email,
