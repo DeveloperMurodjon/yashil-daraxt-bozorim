@@ -236,12 +236,13 @@ export const deleteSellerAccount = async (id: string): Promise<void> => {
 	}
 }
 
-// Confirm order
-export const confirmOrder = async (orderId: number): Promise<Order> => {
+// Update order
+export const confirmOrder = async (
+	orderId: number,
+	status: string
+): Promise<Order> => {
 	try {
-		const response = await api.patch(`/user/order/${orderId}`, {
-			status: 'verified',
-		})
+		const response = await api.patch(`/user/order/${orderId}`, { status })
 		return response.data
 	} catch (error) {
 		console.error('Buyurtmani tasdiqlashda xatolik:', error)

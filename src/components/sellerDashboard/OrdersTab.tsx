@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { MessageSquare, Eye } from 'lucide-react'
+import { MessageSquare, Eye, X } from 'lucide-react'
 import { toast } from 'react-toastify'
 import { getMyOrders, confirmOrder } from '@/services/productService'
 import { Order } from '@/types/types'
@@ -37,13 +37,27 @@ const OrdersTab: React.FC = () => {
 
 	const handleConfirm = async (orderId: number) => {
 		try {
-			const updatedOrder = await confirmOrder(orderId)
+			const updatedOrder = await confirmOrder(orderId, 'completed')
 			setOrders(
 				orders.map(order => (order.id === orderId ? updatedOrder : order))
 			)
 			toast.success('Buyurtma tasdiqlandi')
 		} catch (error) {
 			toast.error('Buyurtmani tasdiqlashda xatolik yuz berdi', {
+				icon: <AlertCircle className='w-5 h-5 text-red-500' />,
+			})
+		}
+	}
+
+	const handleCancel = async (orderId: number) => {
+		try {
+			const updatedOrder = await confirmOrder(orderId, 'cancelled')
+			setOrders(
+				orders.map(order => (order.id === orderId ? updatedOrder : order))
+			)
+			toast.success('Buyurtma bekor qilindi')
+		} catch (error) {
+			toast.error('Buyurtmani bekor qilishda xatolik yuz berdi', {
 				icon: <AlertCircle className='w-5 h-5 text-red-500' />,
 			})
 		}
@@ -70,6 +84,7 @@ const OrdersTab: React.FC = () => {
 									<th className='text-left p-4 font-medium'>Sana</th>
 									<th className='text-left p-4 font-medium'>Holat</th>
 									<th className='text-left p-4 font-medium'>Amallar</th>
+									<th className='text-left p-4 font-medium'></th>
 								</tr>
 							</thead>
 							<tbody>
@@ -84,8 +99,8 @@ const OrdersTab: React.FC = () => {
 									</tr>
 								) : (
 									orders.map(order => (
-										<tr key={order.id} className='border-b'>
-											<td className='p-4'>
+										<tr key={order.id} className='border-b '>
+											<td className='p-4 pr-0'>
 												<div>
 													<p className='font-medium'>{order.product.name}</p>
 													<p className='text-sm text-muted-foreground'>
@@ -111,16 +126,22 @@ const OrdersTab: React.FC = () => {
 											<td className='p-4'>
 												<Badge
 													variant={
-														order.status === 'panding' ? 'secondary' : 'default'
+														order.status === 'panding'
+															? 'secondary'
+															: order.status === 'cancelled'
+															? 'destructive'
+															: 'default'
 													}
 												>
 													{order.status === 'panding'
 														? 'Kutilmoqda'
+														: order.status === 'cancelled'
+														? 'Bekor qilingan'
 														: 'Bajarildi'}
 												</Badge>
 											</td>
-											<td className='p-4'>
-												<div className='flex space-x-2'>
+											<td className='p-4 pr-0'>
+												<div className='flex space-x-2  items-center'>
 													<Button size='sm' variant='outline'>
 														<MessageSquare className='w-4 h-4' />
 													</Button>
@@ -131,7 +152,11 @@ const OrdersTab: React.FC = () => {
 													>
 														<Eye className='w-4 h-4' />
 													</Button>
-													{order.status === 'panding' && (
+												</div>
+											</td>
+											<td className='p-4 pr-0'>
+												{order.status === 'panding' && (
+													<div className='flex flex gap-1 pr-12'>
 														<Button
 															size='sm'
 															variant='default'
@@ -139,8 +164,16 @@ const OrdersTab: React.FC = () => {
 														>
 															Tasdiqlash
 														</Button>
-													)}
-												</div>
+														<Button
+															size='sm'
+															variant='destructive'
+															onClick={() => handleCancel(order.id)}
+														>
+															<X className='w-4 h-4 mr-1' />
+															Bekor qilish
+														</Button>
+													</div>
+												)}
 											</td>
 										</tr>
 									))
@@ -191,6 +224,8 @@ const OrdersTab: React.FC = () => {
 								<strong>Holat:</strong>{' '}
 								{selectedOrder.status === 'panding'
 									? 'Kutilmoqda'
+									: selectedOrder.status === 'cancelled'
+									? 'Bekor qilingan'
 									: 'Bajarildi'}
 							</p>
 							<div>
@@ -199,7 +234,7 @@ const OrdersTab: React.FC = () => {
 								<p>Yoshi: {selectedOrder.product.age} yil</p>
 								<p>Hudud: {selectedOrder.product.region}</p>
 								<p>Yetkazib berish: {selectedOrder.product.deliveryService}</p>
-								<p> Ombordagi soni: {selectedOrder.product.stock}</p>
+								<p>Ombordagi soni: {selectedOrder.product.stock}</p>
 							</div>
 						</div>
 					)}
