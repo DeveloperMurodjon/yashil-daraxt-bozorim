@@ -375,9 +375,9 @@ const CreateProduct: React.FC<CreateProductProps> = ({
 										<option value='' disabled>
 											Tanlang
 										</option>
-										<option value='1'>Meva ko`chat</option>
-										<option value='2'>Manzarali daraxt ko'chat</option>
-										<option value='3'>Ignabargli daraxt ko'chat</option>
+										<option value='3'>Mevali daraxt ko`chat</option>
+										<option value='4'>Manzarali daraxt ko'chat</option>
+										<option value='5'>Ignabargli daraxt ko'chat</option>
 									</select>
 								</div>
 							</div>
