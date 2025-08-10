@@ -6,7 +6,7 @@ export interface Image {
 }
 
 export interface Seller {
-	id: number
+	id?: number
 	createdAt: string
 	updatedAt: string
 	fullName: string
@@ -106,7 +106,7 @@ export interface Product {
 		updatedAt: string
 		name: string
 	}
-	saller: Seller
+	saller?: Seller
 }
 
 export interface SellerT {
@@ -123,7 +123,6 @@ export interface SellerT {
 	products?: Product[]
 }
 
-// Boshqa interfeyslar (agar mavjud bo‘lsa) o‘zgarishsiz qoladi
 export interface UserT {
 	id: number
 	fullName: string

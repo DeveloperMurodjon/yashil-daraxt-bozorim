@@ -4,13 +4,20 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { MessageSquare, Eye } from 'lucide-react'
 import { toast } from 'react-toastify'
-import { getMyOrders } from '@/services/productService'
+import { getMyOrders, confirmOrder } from '@/services/productService'
 import { Order } from '@/types/types'
 import { AlertCircle } from 'lucide-react'
+import {
+	Dialog,
+	DialogContent,
+	DialogHeader,
+	DialogTitle,
+} from '@/components/ui/dialog'
 
 const OrdersTab: React.FC = () => {
 	const [orders, setOrders] = useState<Order[]>([])
 	const [loading, setLoading] = useState(true)
+	const [selectedOrder, setSelectedOrder] = useState<Order | null>(null)
 
 	useEffect(() => {
 		const fetchOrders = async () => {
@@ -27,6 +34,20 @@ const OrdersTab: React.FC = () => {
 		}
 		fetchOrders()
 	}, [])
+
+	const handleConfirm = async (orderId: number) => {
+		try {
+			const updatedOrder = await confirmOrder(orderId)
+			setOrders(
+				orders.map(order => (order.id === orderId ? updatedOrder : order))
+			)
+			toast.success('Buyurtma tasdiqlandi')
+		} catch (error) {
+			toast.error('Buyurtmani tasdiqlashda xatolik yuz berdi', {
+				icon: <AlertCircle className='w-5 h-5 text-red-500' />,
+			})
+		}
+	}
 
 	if (loading) {
 		return <div className='text-center p-4'>Yuklanmoqda...</div>
@@ -103,9 +124,22 @@ const OrdersTab: React.FC = () => {
 													<Button size='sm' variant='outline'>
 														<MessageSquare className='w-4 h-4' />
 													</Button>
-													<Button size='sm' variant='outline'>
+													<Button
+														size='sm'
+														variant='outline'
+														onClick={() => setSelectedOrder(order)}
+													>
 														<Eye className='w-4 h-4' />
 													</Button>
+													{order.status === 'panding' && (
+														<Button
+															size='sm'
+															variant='default'
+															onClick={() => handleConfirm(order.id)}
+														>
+															Tasdiqlash
+														</Button>
+													)}
 												</div>
 											</td>
 										</tr>
@@ -116,6 +150,61 @@ const OrdersTab: React.FC = () => {
 					</div>
 				</CardContent>
 			</Card>
+
+			<Dialog
+				open={!!selectedOrder}
+				onOpenChange={() => setSelectedOrder(null)}
+			>
+				<DialogContent>
+					<DialogHeader>
+						<DialogTitle>Buyurtma tafsilotlari</DialogTitle>
+					</DialogHeader>
+					{selectedOrder && (
+						<div className='space-y-4'>
+							<p>
+								<strong>Buyurtma ID:</strong> {selectedOrder.id}
+							</p>
+							<p>
+								<strong>Mahsulot:</strong> {selectedOrder.product.name}
+							</p>
+							<p>
+								<strong>Xaridor:</strong> {selectedOrder.user.fullName}
+							</p>
+							<p>
+								<strong>Telefon:</strong> {selectedOrder.user.phone}
+							</p>
+							<p>
+								<strong>Email:</strong> {selectedOrder.user.email}
+							</p>
+							<p>
+								<strong>Miqdor:</strong> {selectedOrder.quantity} dona
+							</p>
+							<p>
+								<strong>Summa:</strong>{' '}
+								{parseFloat(selectedOrder.totalPrice).toLocaleString()} so'm
+							</p>
+							<p>
+								<strong>Sana:</strong>{' '}
+								{new Date(selectedOrder.createdAt).toLocaleString()}
+							</p>
+							<p>
+								<strong>Holat:</strong>{' '}
+								{selectedOrder.status === 'panding'
+									? 'Kutilmoqda'
+									: 'Bajarildi'}
+							</p>
+							<div>
+								<strong>Mahsulot tafsilotlari:</strong>
+								<p>Balandligi: {selectedOrder.product.height} sm</p>
+								<p>Yoshi: {selectedOrder.product.age} yil</p>
+								<p>Hudud: {selectedOrder.product.region}</p>
+								<p>Yetkazib berish: {selectedOrder.product.deliveryService}</p>
+								<p> Ombordagi soni: {selectedOrder.product.stock}</p>
+							</div>
+						</div>
+					)}
+				</DialogContent>
+			</Dialog>
 		</div>
 	)
 }

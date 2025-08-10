@@ -137,7 +137,7 @@ export default function SellersList() {
 										<td className='p-2 sm:p-3'>
 											<Button
 												onClick={e => {
-													e.stopPropagation() // Modal ochilishini oldini olish
+													e.stopPropagation()
 													handleDeleteSeller(s.id!)
 												}}
 												className='bg-red-500 hover:bg-red-600 text-white text-xs sm:text-sm'
@@ -164,7 +164,7 @@ export default function SellersList() {
 							{selectedSeller?.fullName}ning mahsulotlari
 						</Dialog.Title>
 						<Dialog.Description className='text-muted-foreground mb-4'>
-							Ushbu sotuvchi tomonidan qo‘shilgan mahsulotlar ro‘yxati
+							Ushbu sotuvchi tomonidan qo`shilgan mahsulotlar ro`yxati
 						</Dialog.Description>
 						{selectedSeller &&
 						selectedSeller.products &&

@@ -142,7 +142,7 @@ export async function confirmSignIn(data: SignInT, type: RoleType) {
 	try {
 		const res = await api.post(endpoint, data)
 		const token = res.data.access_token
-		if (!token) throw new Error('Token topilmadi')
+		// if (!token) throw new Error('Token topilmadi')
 
 		saveUserData({
 			email: data.email,
@@ -235,7 +235,7 @@ export async function loginUser(
 	try {
 		const res = await api.post(endpoint, data)
 		const token = res.data.access_token
-		if (!token) throw new Error('Token topilmadi')
+		// if (!token) throw new Error('saller')
 
 		saveUserData({
 			email: data.email,

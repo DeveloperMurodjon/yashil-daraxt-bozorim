@@ -75,7 +75,7 @@ const UpdateProduct: React.FC<UpdateProductProps> = ({
 	setProducts,
 	handleCancel,
 }) => {
-	const [loading, setLoading] = useState<{ [key: string]: boolean }>({}) // Har bir maydon uchun loading holati
+	const [loading, setLoading] = useState<{ [key: string]: boolean }>({})
 
 	const handleInputChange = (
 		e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -114,7 +114,7 @@ const UpdateProduct: React.FC<UpdateProductProps> = ({
 				return
 			}
 
-			setLoading(prev => ({ ...prev, [field]: true })) // Loading holatini yoqish
+			setLoading(prev => ({ ...prev, [field]: true }))
 
 			const data = new FormData()
 			switch (field) {
@@ -170,7 +170,7 @@ const UpdateProduct: React.FC<UpdateProductProps> = ({
 				icon: <CheckCircle className='w-5 h-5 text-forest' />,
 			})
 			setEditableFields({ ...editableFields, [field]: false })
-			setShowEditProduct(false) // Modalni yopish
+			setShowEditProduct(false)
 			const updatedProducts = await getMyProducts()
 			setProducts(updatedProducts)
 		} catch (error) {
@@ -178,7 +178,7 @@ const UpdateProduct: React.FC<UpdateProductProps> = ({
 				icon: <AlertCircle className='w-5 h-5 text-red-500' />,
 			})
 		} finally {
-			setLoading(prev => ({ ...prev, [field]: false })) // Loading holatini o'chirish
+			setLoading(prev => ({ ...prev, [field]: false }))
 		}
 	}
 
@@ -556,7 +556,7 @@ const UpdateProduct: React.FC<UpdateProductProps> = ({
 											onChange={handleInputChange}
 											className='w-full p-2 border border-border rounded-md bg-background text-forest focus:outline-none focus:ring-2 focus:ring-forest/50'
 										>
-											<option value='1'>Meva ko‘chat</option>
+											<option value='1'>Meva ko`chat</option>
 											<option value='2'>Manzarali daraxt ko'chat</option>
 											<option value='3'>Ignabargli daraxt ko'chat</option>
 										</select>
@@ -566,10 +566,10 @@ const UpdateProduct: React.FC<UpdateProductProps> = ({
 											name='categoryId'
 											value={
 												formData.categoryId === '1'
-													? 'Meva ko‘chat'
+													? 'Meva ko`chat'
 													: formData.categoryId === '2'
-													? 'Manzarali daraxt ko‘chat'
-													: 'Ignabargli daraxt ko‘chat'
+													? 'Manzarali daraxt ko`chat'
+													: 'Ignabargli daraxt ko`chat'
 											}
 											readOnly
 											className='bg-gray-100'

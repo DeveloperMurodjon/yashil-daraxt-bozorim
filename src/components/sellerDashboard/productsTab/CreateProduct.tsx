@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import {
 	Card,
 	CardContent,
@@ -91,14 +91,6 @@ const CreateProduct: React.FC<CreateProductProps> = ({
 }) => {
 	const handleChange = (name: string, value: string | File) => {
 		if (value instanceof File) {
-			// Fayl turini tekshirish
-			const allowedTypes = ['image/jpeg', 'image/png', 'image/gif']
-			if (!allowedTypes.includes(value.type)) {
-				toast.error('Faqat JPG, PNG yoki GIF rasmlarni yuklash mumkin', {
-					icon: <AlertCircle className='w-5 h-5 text-red-500' />,
-				})
-				return
-			}
 			const previewUrl = URL.createObjectURL(value)
 			setFormData({ ...formData, imagePreview: previewUrl })
 			setEditableFields({ ...editableFields, images: true })
@@ -106,6 +98,7 @@ const CreateProduct: React.FC<CreateProductProps> = ({
 			setFormData({ ...formData, [name]: value })
 		}
 	}
+	const [loading, setLoading] = useState(false)
 
 	// Clear form
 	const handleCancel = () => {
@@ -150,33 +143,40 @@ const CreateProduct: React.FC<CreateProductProps> = ({
 				'age',
 				'region',
 				'categoryId',
+				'deliveryService',
 			]
-			if (requiredFields.some(field => !formData[field]?.trim())) {
-				throw new Error('Barcha maydonlarni to‘ldiring')
-			}
 
 			if (!['yes', 'no'].includes(formData.deliveryService)) {
 				throw new Error(
-					'Yetkazib berish xizmati "Mavjud" yoki "Mavjud emas" bo‘lishi kerak'
+					'Yetkazib berish xizmati "Mavjud" yoki "Mavjud emas" bo`lishi kerak'
 				)
 			}
+			setLoading(true)
 
 			const data = new FormData()
-			for (const key in formData) {
-				if (key !== 'imagePreview' && formData[key]) {
-					data.append(key, formData[key])
-				}
-			}
+			const fieldsToSend = [
+				'name',
+				'price',
+				'deliveryService',
+				'stock',
+				'height',
+				'age',
+				'region',
+				'categoryId',
+			]
+			fieldsToSend.forEach(key => {
+				if (formData[key]) data.append(key, formData[key])
+			})
 			const fileInput = document.querySelector(
 				'input[name="images"]'
 			) as HTMLInputElement
 			if (fileInput?.files?.[0]) {
-				// Fayl turini qayta tekshirish
+				const file = fileInput.files[0]
 				const allowedTypes = ['image/jpeg', 'image/png', 'image/gif']
-				if (!allowedTypes.includes(fileInput.files[0].type)) {
+				if (!allowedTypes.includes(file.type)) {
 					throw new Error('Faqat JPG, PNG yoki GIF rasmlarni yuklash mumkin')
 				}
-				data.append('images', fileInput.files[0])
+				data.append('images', file)
 			}
 
 			// FormData consolling
@@ -187,7 +187,7 @@ const CreateProduct: React.FC<CreateProductProps> = ({
 			console.log("Yuborilgan ma'lumotlar:", formDataObject)
 
 			await createProduct(data)
-			toast.success('Mahsulot muvaffaqiyatli qo‘shildi', {
+			toast.success('Mahsulot muvaffaqiyatli qo`shildi', {
 				icon: <CheckCircle className='w-5 h-5 text-forest' />,
 			})
 
@@ -195,11 +195,13 @@ const CreateProduct: React.FC<CreateProductProps> = ({
 			setProducts(await getMyProducts())
 		} catch (error: unknown) {
 			toast.error(
-				error instanceof Error ? error.message : 'Mahsulot qo‘shishda xatolik',
+				error instanceof Error ? error.message : 'Mahsulot qo`shishda xatolik',
 				{
 					icon: <AlertCircle className='w-5 h-5 text-red-500' />,
 				}
 			)
+		} finally {
+			setLoading(false)
 		}
 	}
 
@@ -237,7 +239,7 @@ const CreateProduct: React.FC<CreateProductProps> = ({
 				<Card className='shadow-nature'>
 					<CardHeader>
 						<CardTitle className='text-forest'>
-							Yangi Mahsulot Qo‘shish
+							Yangi Mahsulot Qo'shish
 						</CardTitle>
 						<CardDescription>
 							Mahsulot ma'lumotlarini to'ldiring
@@ -285,9 +287,6 @@ const CreateProduct: React.FC<CreateProductProps> = ({
 										className='w-full p-2 border border-border rounded-md bg-background text-forest focus:outline-none focus:ring-2 focus:ring-forest/50'
 										required
 									>
-										<option value='' disabled>
-											Tanlang
-										</option>
 										<option value='yes'>Mavjud</option>
 										<option value='no'>Mavjud emas</option>
 									</select>
@@ -343,18 +342,18 @@ const CreateProduct: React.FC<CreateProductProps> = ({
 										required
 									>
 										<option value='' disabled>
-											Viloyat tanlang
+											Tanlang
 										</option>
 										<option value='Andijon'>Andijon</option>
 										<option value='Buxoro'>Buxoro</option>
-										<option value='Farg‘ona'>Farg‘ona</option>
+										<option value="Farg'ona">Farg'ona</option>
 										<option value='Jizzax'>Jizzax</option>
 										<option value='Xorazm'>Xorazm</option>
 										<option value='Namangan'>Namangan</option>
 										<option value='Navoiy'>Navoiy</option>
 										<option value='Qashqadaryo'>Qashqadaryo</option>
-										<option value='Qoraqalpog‘iston'>
-											Qoraqalpog‘iston Respublikasi
+										<option value="Qoraqalpog'iston">
+											Qoraqalpog'iston Respublikasi
 										</option>
 										<option value='Samarqand'>Samarqand</option>
 										<option value='Sirdaryo'>Sirdaryo</option>
@@ -374,9 +373,9 @@ const CreateProduct: React.FC<CreateProductProps> = ({
 										required
 									>
 										<option value='' disabled>
-											Kategoriya tanlang
+											Tanlang
 										</option>
-										<option value='1'>Meva ko‘chat</option>
+										<option value='1'>Meva ko`chat</option>
 										<option value='2'>Manzarali daraxt ko'chat</option>
 										<option value='3'>Ignabargli daraxt ko'chat</option>
 									</select>
@@ -416,10 +415,11 @@ const CreateProduct: React.FC<CreateProductProps> = ({
 							</div>
 							<div className='flex space-x-4'>
 								<Button
+									disabled={loading}
 									type='submit'
 									className='bg-gradient-to-r from-forest to-moss hover:from-primary-hover hover:to-forest'
 								>
-									Sotuvga chiqarish
+									{loading ? 'Yuklanmoqda...' : 'Sotuvga chiqarish'}
 								</Button>
 								<Button variant='outline' onClick={handleCancel}>
 									Bekor qilish
