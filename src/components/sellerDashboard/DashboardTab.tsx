@@ -35,7 +35,7 @@ const DashboardTab: React.FC = () => {
 	const stats = {
 		totalProducts: products.length,
 		totalOrders: orders.length,
-		pendingOrders: orders.filter(order => order.status === 'pending').length,
+		pendingOrders: orders.filter(order => order.status === 'panding').length,
 		totalRevenue: orders
 			.reduce((sum, order) => sum + parseFloat(order.totalPrice), 0)
 			.toLocaleString(),

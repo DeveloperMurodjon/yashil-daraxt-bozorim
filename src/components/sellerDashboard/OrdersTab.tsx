@@ -23,7 +23,12 @@ const OrdersTab: React.FC = () => {
 		const fetchOrders = async () => {
 			try {
 				const data = await getMyOrders()
-				setOrders(data)
+				// Buyurtmalarni createdAt bo'yicha teskari tartibda sorthlash
+				const sortedOrders = data.sort(
+					(a, b) =>
+						new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+				)
+				setOrders(sortedOrders)
 			} catch (error) {
 				toast.error('Buyurtmalarni yuklashda xatolik yuz berdi', {
 					icon: <AlertCircle className='w-5 h-5 text-red-500' />,
@@ -84,7 +89,6 @@ const OrdersTab: React.FC = () => {
 									<th className='text-left p-4 font-medium'>Sana</th>
 									<th className='text-left p-4 font-medium'>Holat</th>
 									<th className='text-left p-4 font-medium'>Amallar</th>
-									<th className='text-left p-4 font-medium'></th>
 								</tr>
 							</thead>
 							<tbody>
@@ -99,8 +103,8 @@ const OrdersTab: React.FC = () => {
 									</tr>
 								) : (
 									orders.map(order => (
-										<tr key={order.id} className='border-b '>
-											<td className='p-4 pr-0'>
+										<tr key={order.id} className='border-b'>
+											<td className='p-4'>
 												<div>
 													<p className='font-medium'>{order.product.name}</p>
 													<p className='text-sm text-muted-foreground'>
@@ -140,8 +144,8 @@ const OrdersTab: React.FC = () => {
 														: 'Bajarildi'}
 												</Badge>
 											</td>
-											<td className='p-4 pr-0'>
-												<div className='flex space-x-2  items-center'>
+											<td className='p-4'>
+												<div className='flex space-x-2'>
 													<Button size='sm' variant='outline'>
 														<MessageSquare className='w-4 h-4' />
 													</Button>
@@ -152,28 +156,26 @@ const OrdersTab: React.FC = () => {
 													>
 														<Eye className='w-4 h-4' />
 													</Button>
+													{order.status === 'panding' && (
+														<>
+															<Button
+																size='sm'
+																variant='default'
+																onClick={() => handleConfirm(order.id)}
+															>
+																Tasdiqlash
+															</Button>
+															<Button
+																size='sm'
+																variant='destructive'
+																onClick={() => handleCancel(order.id)}
+															>
+																<X className='w-4 h-4 mr-1' />
+																Bekor qilish
+															</Button>
+														</>
+													)}
 												</div>
-											</td>
-											<td className='p-4 pr-0'>
-												{order.status === 'panding' && (
-													<div className='flex flex gap-1 pr-12'>
-														<Button
-															size='sm'
-															variant='default'
-															onClick={() => handleConfirm(order.id)}
-														>
-															Tasdiqlash
-														</Button>
-														<Button
-															size='sm'
-															variant='destructive'
-															onClick={() => handleCancel(order.id)}
-														>
-															<X className='w-4 h-4 mr-1' />
-															Bekor qilish
-														</Button>
-													</div>
-												)}
 											</td>
 										</tr>
 									))
