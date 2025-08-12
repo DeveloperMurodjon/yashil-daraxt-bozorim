@@ -232,6 +232,7 @@ export async function loginUser(
 	type: RoleType
 ) {
 	const endpoint = type === 'seller' ? '/auth/saller/login' : '/auth/user/login'
+
 	try {
 		const res = await api.post(endpoint, data)
 		const token = res.data.access_token

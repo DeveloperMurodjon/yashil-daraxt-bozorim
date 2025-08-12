@@ -44,7 +44,7 @@ const Navbar = () => {
 				orders: '/user-dashboard?tab=orders',
 			}
 			return userTabs[tab] || '/user-dashboard?tab=browse'
-		} else if (role === 'seller') {
+		} else if (role === 'saller') {
 			const sellerTabs = {
 				dashboard: '/seller-dashboard?tab=dashboard',
 				products: '/seller-dashboard?tab=products',
@@ -95,7 +95,7 @@ const Navbar = () => {
 							to={getDashboardLink(role === 'user' ? 'browse' : 'dashboard')}
 						>
 							<Button variant='ghost' size='icon' className='hover:bg-sage/50'>
-								{role === 'seller' ? (
+								{role === 'saller' ? (
 									<img
 										src={DashboardIcon}
 										alt='Dashboard Icon'
@@ -111,7 +111,7 @@ const Navbar = () => {
 							to={getDashboardLink(role === 'user' ? 'favorites' : 'products')}
 						>
 							<Button variant='ghost' size='icon' className='hover:bg-sage/50'>
-								{role === 'seller' ? (
+								{role === 'saller' ? (
 									<img
 										src={ProductIcon}
 										alt='Product Icon'
@@ -143,7 +143,7 @@ const Navbar = () => {
 								to={
 									role === 'user'
 										? '/user-dashboard?tab=profile'
-										: role === 'seller'
+										: role === 'saller'
 										? '/seller-dashboard?tab=profile'
 										: '/'
 								}
@@ -211,7 +211,7 @@ const Navbar = () => {
 									onClick={() => setIsMenuOpen(false)}
 								>
 									<Button variant='outline' className='w-full justify-start'>
-										{role === 'seller' ? (
+										{role === 'saller' ? (
 											<img
 												src={DashboardIcon}
 												alt='Dashboard Icon'
@@ -220,7 +220,7 @@ const Navbar = () => {
 										) : (
 											<Search className='h-4 w-4 mr-2' />
 										)}
-										{role === 'seller' ? 'Dashboard' : 'Qidirish'}
+										{role === 'saller' ? 'Dashboard' : 'Qidirish'}
 									</Button>
 								</Link>
 
@@ -231,7 +231,7 @@ const Navbar = () => {
 									onClick={() => setIsMenuOpen(false)}
 								>
 									<Button variant='outline' className='w-full justify-start'>
-										{role === 'seller' ? (
+										{role === 'saller' ? (
 											<img
 												src={ProductIcon}
 												alt='Product Icon'
@@ -240,14 +240,14 @@ const Navbar = () => {
 										) : (
 											<Heart className='h-4 w-4 mr-2' />
 										)}
-										{role === 'seller' ? 'Mahsulotlar' : 'Sevimlilar'}
+										{role === 'saller' ? 'Mahsulotlar' : 'Sevimlilar'}
 									</Button>
 								</Link>
 
 								{isLoggedIn ? (
 									<Link
 										to={
-											role === 'seller'
+											role === 'saller'
 												? '/seller-dashboard?tab=profile'
 												: role === 'user'
 												? '/user-dashboard?tab=profile'

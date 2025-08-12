@@ -123,10 +123,11 @@ export default function Login({ role, RoleSelector }: LoginProps) {
 		try {
 			localStorage.clear()
 			const data = await loginUser({ email, password }, role)
+			console.log('data:', data)
 			localStorage.setItem('access_token', data.access_token || data.token)
-			localStorage.setItem('userId', String(data.userId || data.id || ''))
+			localStorage.setItem('userId', String(data.userId || ''))
 			localStorage.setItem('email', data.email || '')
-			localStorage.setItem('role', role)
+			localStorage.setItem('role', data.role)
 			toast.success('Tizimga muvaffaqiyatli kirdingiz!', {
 				icon: <CheckCircle className='w-5 h-5 text-forest' />,
 			})

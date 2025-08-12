@@ -35,7 +35,7 @@ const LandingPage = () => {
 			navigate('/auth')
 		} else if (role === 'user') {
 			navigate('/user-dashboard')
-		} else if (role === 'seller') {
+		} else if (role === 'saller') {
 			navigate('/seller-dashboard')
 		}
 	}
@@ -156,7 +156,7 @@ const LandingPage = () => {
 								onClick={handleViewTreesClick}
 								className='w-full bg-gradient-to-r from-forest to-moss hover:from-primary-hover hover:to-forest shadow-nature transition-all duration-300 transform hover:scale-105'
 							>
-								{role === 'seller'
+								{role === 'saller'
 									? "Ko'chatlarni Sotish"
 									: "Ko'chatlarni Ko'rish"}
 								<ArrowRight className='ml-2 h-5 w-5' />
@@ -304,7 +304,7 @@ const LandingPage = () => {
 							onClick={handleViewTreesClick}
 							className='w-full bg-primary-foreground text-forest hover:bg-primary-foreground/90'
 						>
-							{role === 'seller'
+							{role === 'saller'
 								? "Ko'chatlarni Sotish"
 								: "Ko'chatlarni Ko'rish"}
 							<ArrowRight className='ml-2 h-5 w-5' />

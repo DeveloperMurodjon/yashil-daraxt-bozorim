@@ -15,7 +15,7 @@ const UserDashboard = () => {
 	const [activeTab, setActiveTab] = useState(initialTab)
 	const [user, setUser] = useState<UserProfile>({
 		id: localStorage.getItem('userId') || '',
-		fullName: localStorage.getItem('fullname') || '',
+		fullName: localStorage.getItem('fullName') || '',
 		email: localStorage.getItem('email') || '',
 		phone: '',
 		role:

@@ -19,7 +19,7 @@ const SellerDashboard = () => {
 	const [pendingOrders, setPendingOrders] = useState(0)
 	const [user, setUser] = useState<UserProfile>({
 		id: localStorage.getItem('userId') || '',
-		fullName: localStorage.getItem('fullname') || '',
+		fullName: localStorage.getItem('fullName') || '',
 		email: localStorage.getItem('email') || '',
 		phone: '',
 		role:
@@ -40,10 +40,9 @@ const SellerDashboard = () => {
 			try {
 				const profile = await getSellerProfile()
 				setUser(profile)
-				localStorage.setItem('userId', profile.id)
-				localStorage.setItem('fullname', profile.fullName)
+				localStorage.setItem('fullName', profile.fullName)
 				localStorage.setItem('email', profile.email)
-				localStorage.setItem('role', profile.role)
+
 				if (profile.sellerInfo) {
 					localStorage.setItem('sellerInfo', JSON.stringify(profile.sellerInfo))
 				}
