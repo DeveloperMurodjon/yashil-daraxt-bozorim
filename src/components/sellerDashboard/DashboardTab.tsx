@@ -7,7 +7,13 @@ import {
 	CardTitle,
 } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { Package, Users, MessageSquare, TrendingUp } from 'lucide-react'
+import {
+	Package,
+	Users,
+	MessageSquare,
+	TrendingUp,
+	CheckCircle,
+} from 'lucide-react'
 import { toast } from 'react-toastify'
 import { getMyProducts, getMyOrders } from '@/services/productService'
 import { Product, Order } from '@/types/types'
@@ -23,8 +29,16 @@ const DashboardTab: React.FC = () => {
 					getMyProducts(),
 					getMyOrders(),
 				])
+
 				setProducts(productsData)
-				setOrders(ordersData)
+
+				// createdAt bo‘yicha eng yangilarni tepaga chiqarish
+				const sortedOrders = [...ordersData].sort(
+					(a, b) =>
+						new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+				)
+
+				setOrders(sortedOrders)
 			} catch (error) {
 				toast.error('Ma`lumotlarni yuklashda xatolik yuz berdi')
 			}
@@ -36,7 +50,10 @@ const DashboardTab: React.FC = () => {
 		totalProducts: products.length,
 		totalOrders: orders.length,
 		pendingOrders: orders.filter(order => order.status === 'panding').length,
+		completedOrders: orders.filter(order => order.status === 'completed')
+			.length,
 		totalRevenue: orders
+			.filter(order => order.status === 'completed')
 			.reduce((sum, order) => sum + parseFloat(order.totalPrice), 0)
 			.toLocaleString(),
 	}
@@ -95,6 +112,20 @@ const DashboardTab: React.FC = () => {
 					<CardContent className='p-6'>
 						<div className='flex items-center justify-between'>
 							<div>
+								<p className='text-muted-foreground text-sm'>Tasdiqlangan</p>
+								<p className='text-2xl font-bold text-forest'>
+									{stats.completedOrders}
+								</p>
+							</div>
+							<CheckCircle className='w-8 h-8 text-forest' />
+						</div>
+					</CardContent>
+				</Card>
+
+				<Card className='shadow-card'>
+					<CardContent className='p-6'>
+						<div className='flex items-center justify-between'>
+							<div>
 								<p className='text-muted-foreground text-sm'>Jami Daromad</p>
 								<p className='text-2xl font-bold text-forest'>
 									{stats.totalRevenue} so'm
@@ -131,10 +162,18 @@ const DashboardTab: React.FC = () => {
 									</p>
 									<Badge
 										variant={
-											order.status === 'pending' ? 'secondary' : 'default'
+											order.status === 'completed'
+												? 'default'
+												: order.status === 'cancelled'
+												? 'destructive'
+												: 'outline'
 										}
 									>
-										{order.status === 'pending' ? 'Kutilmoqda' : 'Bajarildi'}
+										{order.status === 'completed'
+											? 'Bajarildi'
+											: order.status === 'cancelled'
+											? 'Bekor qilingan'
+											: 'Kutilmoqda'}
 									</Badge>
 								</div>
 							</div>

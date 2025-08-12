@@ -23,7 +23,7 @@ const OrdersTab: React.FC = () => {
 		const fetchOrders = async () => {
 			try {
 				const data = await getMyOrders()
-				// Buyurtmalarni createdAt bo'yicha teskari tartibda sorthlash
+
 				const sortedOrders = data.sort(
 					(a, b) =>
 						new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
