@@ -2,7 +2,16 @@ import { useEffect, useState } from 'react'
 import { deleteSeller, getAllSellers, deleteProduct } from '@/services/admin'
 import { SellerT, Product } from '@/types/types'
 import { Button } from '@/components/ui/button'
-import { Trash2, CheckCircle, AlertCircle } from 'lucide-react'
+import {
+	Trash2,
+	CheckCircle,
+	AlertCircle,
+	UserCheckIcon,
+	User,
+	Network,
+	LocateIcon,
+	TrendingUp,
+} from 'lucide-react'
 import { toast } from 'react-toastify'
 import * as Dialog from '@radix-ui/react-dialog'
 import { Card, CardContent } from '@/components/ui/card'
@@ -36,6 +45,9 @@ export default function SellersList() {
 			})
 	}, [])
 
+	const stats = {
+		totalSellers: sellers.length,
+	}
 	const handleDeleteSeller = async (id: number) => {
 		if (!confirm('Haqiqatan sotuvchini o`chirishni xohlaysizmi?')) return
 		try {
@@ -93,6 +105,72 @@ export default function SellersList() {
 				<h1 className='text-lg sm:text-2xl md:text-3xl font-bold text-forest text-center'>
 					Sotuvchilar ro`yxati
 				</h1>
+				<div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6'>
+					<Card className='shadow-card'>
+						<CardContent className='p-6'>
+							<div className='flex items-center justify-between'>
+								<div>
+									<p className='text-muted-foreground text-sm'>
+										Umumiy Sotuvchilar
+									</p>
+									<p className='text-2xl font-bold text-forest'>
+										{stats.totalSellers}
+									</p>
+								</div>
+								<User className='w-8 h-8 text-forest' />
+							</div>
+						</CardContent>
+					</Card>
+
+					<Card className='shadow-card'>
+						<CardContent className='p-6'>
+							<div className='flex items-center justify-between'>
+								<div>
+									<p className='text-muted-foreground text-sm'>
+										Faol Sotuvchilar{' '}
+									</p>
+									<p className='text-2xl font-bold text-forest'>
+										{/* {stats.activeSellers} */}
+									</p>
+								</div>
+								<UserCheckIcon className='w-8 h-8 text-forest' />
+							</div>
+						</CardContent>
+					</Card>
+
+					<Card className='shadow-card'>
+						<CardContent className='p-6'>
+							<div className='flex items-center justify-between'>
+								<div>
+									<p className='text-muted-foreground text-sm'>
+										Yangi qo'shilgan
+									</p>
+									<p className='text-2xl font-bold text-gold'>
+										{/* {stats.newUsers} */}
+									</p>
+								</div>
+								<Network className='w-8 h-8 text-gold' />
+							</div>
+						</CardContent>
+					</Card>
+
+					<Card className='shadow-card'>
+						<CardContent className='p-6'>
+							<div className='flex items-center justify-between'>
+								<div>
+									<p className='text-muted-foreground text-sm'>
+										Shaharlar soni
+									</p>
+									<p className='text-2xl font-bold text-forest'>
+										{/* {stats.cities} */}
+									</p>
+								</div>
+								<LocateIcon className='w-8 h-8 text-forest' />
+							</div>
+						</CardContent>
+					</Card>
+				</div>
+
 				{loading ? (
 					<p className='text-center text-forest text-sm sm:text-lg'>
 						Ma`lumotlar yuklanmoqda...
